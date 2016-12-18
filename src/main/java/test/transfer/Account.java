@@ -7,7 +7,7 @@ import static java.math.RoundingMode.HALF_UP;
 
 public class Account {
 
-    private final String number;
+    final String number;
     BigDecimal amount;
     private String currency;
 
@@ -76,6 +76,18 @@ public class Account {
             amount = amount.subtract(transferAmount);
             to.amount = to.amount == null ? transferAmount : to.amount.add(transferAmount);
         }
+    }
+
+    public BigDecimal getBalance() {
+        return amount;
+    }
+
+    public void debit(BigDecimal amount) {
+
+    }
+
+    public void credit(BigDecimal amount) {
+
     }
 }
 
