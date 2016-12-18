@@ -1,4 +1,4 @@
-package test.transfer;
+package test.transfer.model;
 
 import java.math.BigDecimal;
 import java.util.Random;

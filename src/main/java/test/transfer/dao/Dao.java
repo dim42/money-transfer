@@ -1,4 +1,4 @@
-package pack1;
+package test.transfer.dao;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
