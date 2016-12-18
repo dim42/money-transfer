@@ -31,7 +31,7 @@ public class Account {
         assert 0 == account2.amount.compareTo(new BigDecimal(15.74).setScale(2, HALF_UP));
     }
 
-    public void transferMoney(Account to, BigDecimal transferAmount) {
+    public void transferMoney1(Account to, BigDecimal transferAmount) {
         synchronized (this) {
             synchronized (to) {
                 if (amount != null && amount.compareTo(transferAmount) > 0) {
@@ -51,20 +51,20 @@ public class Account {
         System.out.println(this.amount + " " + to.amount + "\n");
     }
 
-    public void transferMoney1(Account to, BigDecimal transferAmount) {
+    public void transferMoney(final Account to, BigDecimal transferAmount) {
         if (number.equals(to.number)) {
 //            throw new RuntimeException("The same account number.");
             return;
         }
         if (number.compareTo(to.number) > 0) {
-            synchronized (this.number) {
-                synchronized (to.number) {
+            synchronized (this) {
+                synchronized (to) {
                     doTransfer(to, transferAmount);
                 }
             }
         } else {
-            synchronized (to.number) {
-                synchronized (this.number) {
+            synchronized (to) {
+                synchronized (this) {
                     doTransfer(to, transferAmount);
                 }
             }
@@ -79,7 +79,7 @@ public class Account {
     }
 }
 
-class DemonstrateDeadlock {
+class DemonstrateNoDeadlock {
     private static final int NUM_THREADS = 20;
     private static final int NUM_ACCOUNTS = 5;
     private static final int NUM_ITERATIONS = 1000000;
