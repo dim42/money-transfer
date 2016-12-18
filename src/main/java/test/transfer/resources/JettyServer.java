@@ -1,7 +1,4 @@
-package test.transfer.resources;/*
-javac -cp .:javax.servlet-api-3.1.0.jar:jetty-server-9.4.0.v20161208.jar:jetty-util-9.4.0.v20161208.jar:jetty-http-9.4.0.v20161208.jar:jetty-io
--9.4.0.v20161208.jar HelloWorld.java
-*/
+package test.transfer.resources;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -17,11 +14,15 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.util.Arrays;
 
 public class JettyServer extends AbstractHandler {
 
     private static final Logger log = LogManager.getLogger();
+    private static final String LOCALHOST = "localhost";
+    static final int JETTY_PORT = 8080;
 
     @Override
     public void handle(String target,
@@ -44,10 +45,13 @@ public class JettyServer extends AbstractHandler {
     }
 
     public static void main(String[] args) throws Exception {
-        log.info("log args:" + Arrays.toString(args));
+        log.info("JettyServer main args:" + Arrays.toString(args));
         Server server = null;
         try {
-            server = startServer();
+            InetAddress inetAddress = InetAddress.getByName(LOCALHOST);
+            InetSocketAddress address = new InetSocketAddress(inetAddress, JETTY_PORT);
+            server = createServer2(address);
+            server.start();
             server.join();
         } finally {
             if (server != null) {
@@ -56,84 +60,30 @@ public class JettyServer extends AbstractHandler {
         }
     }
 
-    public static Server startServer() throws Exception {
-        Server server = new Server(8080);
+    public static Server createServer(InetSocketAddress address) {
+        Server server = new Server(address);
         server.setHandler(new JettyServer());
-        server.start();
         return server;
     }
 
-    public static Server startServer1() throws Exception {
-        Server server = new Server(8080);
-//        ServletContextHandler context = new ServletContextHandler();
-//        new ServletContext("/context",Context.SESSIONS|Context.NO_SECURITY);
-//        ServletHolder holder = new ServletHolder();
-
-//        server.setHandler(new JettyServer());
+    public static Server createServer1(InetSocketAddress address) {
+        Server server = new Server(address);
+        ServletContextHandler context = new ServletContextHandler(server, "/", ServletContextHandler.SESSIONS);
         ServletHolder holder = new ServletHolder(ServletContainer.class);
-        holder.setInitParameter(ServerProperties.PROVIDER_CLASSNAMES, JettyResource.class.getCanonicalName());
-        ServletContextHandler context = new ServletContextHandler(server, "/*", ServletContextHandler.SESSIONS);
+        holder.setInitParameter(ServerProperties.PROVIDER_CLASSNAMES, JettyResource.class.getName());
         context.addServlet(holder, "/*");
-        server.start();
         return server;
     }
 
-    public static Server startServer2() throws Exception {
-        Server server = new Server(8080);
-
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
-        context.setContextPath("/");
-        server.setHandler(context);
-
-//        ServletHolder jerseyServlet = context.addServlet(ServletContainer.class, "/webapi/*");
-        ServletHolder jerseyServlet = context.addServlet(ServletContainer.class, "/*");
-        jerseyServlet.setInitOrder(1);
-        jerseyServlet.setInitParameter("jersey.config.server.provider.packages", "resources");
-
-//        ServletHolder staticServlet = context.addServlet(DefaultServlet.class, "/*");
-//        staticServlet.setInitParameter("resourceBase", "src/main/webapp");
-//        staticServlet.setInitParameter("pathInfoOnly", "true");
-
-        try {
-            server.start();
-        } catch (Throwable t) {
-            t.printStackTrace(System.err);
-        }
-        return server;
-    }
-
-    public static Server startServer3() throws Exception {
+    public static Server createServer2(InetSocketAddress address) {
+        Server server = new Server(address);
         ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
         context.setContextPath("/");
-
-        Server server = new Server(8080);
-        server.setHandler(context);
-
         ServletHolder holder = context.addServlet(ServletContainer.class, "/*");
         holder.setInitOrder(0);
-
         // Tells the Jersey Servlet which REST service/class to load.
-        holder.setInitParameter(ServerProperties.PROVIDER_CLASSNAMES, JettyResource.class.getCanonicalName());
-//        holder.setInitParameter(ServerProperties.PROVIDER_PACKAGES, JettyResource.class.getCanonicalName());
-
-        server.start();
-        return server;
-    }
-
-    public static Server startServer4() throws Exception {
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.setContextPath("/");
-
-        Server server = new Server(8080);
+        holder.setInitParameter(ServerProperties.PROVIDER_PACKAGES, "test.transfer.resources");
         server.setHandler(context);
-
-        ServletHolder jerseyServlet = context.addServlet(ServletContainer.class, "/*");
-        jerseyServlet.setInitOrder(0);
-
-        // Tells the Jersey Servlet which REST service/class to load.
-        jerseyServlet.setInitParameter("jersey.config.server.provider.classnames", JettyResource.class.getCanonicalName());
-
-        server.start();
         return server;
     }
 }

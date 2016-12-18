@@ -15,7 +15,7 @@ public class GrizzlyResource {
     @Path("/")
     @Produces(MediaType.TEXT_PLAIN)
     public String root() {
-        return "Root!";
+        return "grizzly root";
     }
 
     /**
