@@ -7,6 +7,7 @@ package test.transfer.resources;
 //import com.sun.jersey.api.client.config.DefaultClientConfig;
 
 import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.jackson.JacksonFeature;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -53,7 +54,7 @@ public class JerseyClient {
     }
 
     public static WebTarget getWebTarget(String uri) {
-        ClientConfig config = new ClientConfig();
+        ClientConfig config = new ClientConfig().register(JacksonFeature.class);
         Client client = ClientBuilder.newClient(config);
         return client.target(uri);
     }

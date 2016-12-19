@@ -7,15 +7,16 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
-import static javax.ws.rs.core.Response.Status.OK;
+import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static org.junit.Assert.assertEquals;
 import static test.transfer.resources.JerseyClient.getWebTarget;
 import static test.transfer.resources.JettyServer.JETTY_PORT;
+import static test.transfer.resources.ResultCode.OK;
 
 public class JettyTest {
 
@@ -44,10 +45,17 @@ public class JettyTest {
     }
 
     @Test
-    public void testGet() {
-        Response response = target.request().get();
+    public void testTransfer() {
+        String from = "1234";
+        String to = "1235";
+        String amount = "100.60";
+        String cur = "RUR";
+        TransferRequest rq = new TransferRequest(from, to, amount, cur);
 
-        assertEquals(OK.getStatusCode(), response.getStatus());
-        log.error("readEntity response:" + response.readEntity(String.class));
+        TransferResponse response = target.path("transfer/a2a").request(APPLICATION_JSON_TYPE).post(Entity.entity(rq, APPLICATION_JSON_TYPE),
+                TransferResponse.class);
+
+        log.info("response:" + response);
+        assertEquals(response.toString(), OK.toString(), response.getResultCode());
     }
 }
