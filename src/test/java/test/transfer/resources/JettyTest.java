@@ -46,16 +46,16 @@ public class JettyTest {
 
     @Test
     public void testTransfer() {
+        log.info("test started");
         String from = "1234";
         String to = "1235";
-        String amount = "100.60";
+        String amount = "-100.606";
         String cur = "RUR";
         TransferRequest rq = new TransferRequest(from, to, amount, cur);
 
         TransferResponse response = target.path("transfer/a2a").request(APPLICATION_JSON_TYPE).post(Entity.entity(rq, APPLICATION_JSON_TYPE),
                 TransferResponse.class);
 
-        log.info("response:" + response);
-        assertEquals(response.toString(), OK.toString(), response.getResultCode());
+        assertEquals(response.getMessage(), OK.toString(), response.getResultCode());
     }
 }

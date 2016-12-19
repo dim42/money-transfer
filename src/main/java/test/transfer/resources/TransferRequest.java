@@ -1,6 +1,10 @@
 package test.transfer.resources;
 
 import javax.xml.bind.annotation.XmlRootElement;
+import java.math.BigDecimal;
+
+import static java.math.BigDecimal.ZERO;
+import static java.math.RoundingMode.DOWN;
 
 @XmlRootElement
 public class TransferRequest {
@@ -51,5 +55,24 @@ public class TransferRequest {
 
     public void setCur(String cur) {
         this.cur = cur;
+    }
+
+    public void validate() {
+        requireNonBlank(from, "From account is empty");
+        requireNonBlank(to, "To account is empty");
+        requireNonBlank(amount, "Amount is empty");
+        requireNonBlank(cur, "Currency is empty");
+        if (from.equals(to)) {
+            throw new IllegalArgumentException("Accounts are equal");
+        }
+        if (new BigDecimal(amount).setScale(2, DOWN).compareTo(ZERO) < 0) {
+            throw new IllegalArgumentException("Amount is negative");
+        }
+    }
+
+    private void requireNonBlank(String obj, String message) {
+        if (obj == null) {
+            throw new IllegalArgumentException(message);
+        }
     }
 }

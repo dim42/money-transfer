@@ -2,6 +2,8 @@ package test.transfer.resources;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import test.transfer.model.Account;
+import test.transfer.model.Transfer;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -10,6 +12,7 @@ import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
+import java.math.BigDecimal;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_XML;
@@ -36,7 +39,11 @@ public class JettyResource {
     public TransferResponse transfer(TransferRequest request) {
         log.info("request:" + request);
         try {
-
+            request.validate();
+            BigDecimal amount = new BigDecimal(request.getAmount());
+            Account fromAcct = new Account(request.getFrom());
+            Account toAcct = new Account(request.getTo());
+            new Transfer(fromAcct, toAcct).transferMoney(amount);
         } catch (Exception e) {
             return new TransferResponse(FAIL, e.getMessage());
         }
