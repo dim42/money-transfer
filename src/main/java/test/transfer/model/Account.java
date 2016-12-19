@@ -2,6 +2,8 @@ package test.transfer.model;
 
 import java.math.BigDecimal;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static java.math.BigDecimal.ZERO;
 import static java.math.RoundingMode.HALF_UP;
@@ -32,6 +34,7 @@ public class Account {
         assert 0 == account2.balance.compareTo(new BigDecimal(15.74).setScale(2, HALF_UP));
     }
 
+    // deadlock
     public void transferMoney1(Account to, BigDecimal transferAmount) {
         synchronized (this) {
             synchronized (to) {
@@ -44,18 +47,23 @@ public class Account {
     }
 
     public void transferMoney2(Account to, BigDecimal transferAmount) {
-        System.out.println(this.balance + " " + to.balance + " " + transferAmount);
+//        System.out.println(this.balance + " " + to.balance + " " + transferAmount);
         if (balance != null && balance.compareTo(transferAmount) > 0) {
             balance = balance.subtract(transferAmount);
             to.balance = to.balance == null ? transferAmount : to.balance.add(transferAmount);
         }
-        System.out.println(this.balance + " " + to.balance + "\n");
+//        System.out.println(this.balance + " " + to.balance + "\n");
     }
 
+    static AtomicInteger in1 = new AtomicInteger(0);
+    static AtomicInteger in2 = new AtomicInteger(0);
+
     public void transferMoney(final Account to, BigDecimal transferAmount) {
+        in1.incrementAndGet();
         if (number.equals(to.number)) {
-//            throw new RuntimeException("The same account number.");
-            return;
+            in2.incrementAndGet();
+//            System.out.println("equals");
+            throw new RuntimeException("The same account number.");
         }
         if (number.compareTo(to.number) > 0) {
             synchronized (this) {
@@ -78,6 +86,12 @@ public class Account {
             to.balance = to.balance == null ? transferAmount : to.balance.add(transferAmount);
         }
     }
+//    private void doTransfer(Account toAcct, BigDecimal amount) {
+//        checkInsufficientBalance(amount);
+//        debit(amount);
+//        toAcct.credit(amount);
+//    }
+
 
     public BigDecimal getBalance() {
         return balance != null ? balance : ZERO;
@@ -96,6 +110,10 @@ public class Account {
             throw new RuntimeException("Insufficient balance for account:" + this);
         }
     }
+
+    public boolean greater(Account account) {
+        return number.compareTo(account.number) > 0;
+    }
 }
 
 class DemonstrateNoDeadlock {
@@ -113,11 +131,23 @@ class DemonstrateNoDeadlock {
         class TransferThread extends Thread {
             public void run() {
                 for (int i = 0; i < NUM_ITERATIONS; i++) {
-                    int fromAcct = rnd.nextInt(NUM_ACCOUNTS);
-                    int toAcct = rnd.nextInt(NUM_ACCOUNTS);
-//                DollarAmount balance = new DollarAmount(rnd.nextInt(1000));
+                    int fromInd = rnd.nextInt(NUM_ACCOUNTS);
+                    int toInd = rnd.nextInt(NUM_ACCOUNTS);
+                    Account fromAcct = accounts[fromInd];
+                    Account toAcct = accounts[toInd];
+                    while (fromAcct.number.equals(toAcct.number)) {
+                        toInd = rnd.nextInt(NUM_ACCOUNTS);
+                        toAcct = accounts[toInd];
+                    }
                     BigDecimal amount = new BigDecimal(rnd.nextInt(100));
-                    accounts[fromAcct].transferMoney(accounts[toAcct], amount);
+                    try {
+//                        fromAcct.transferMoney(toAcct, amount);
+//                        fromAcct.transferMoney1(toAcct, amount);
+//                        fromAcct.transferMoney2(toAcct, amount);
+//                        new Transfer(fromAcct, toAcct).transferMoney(amount);
+                        new Transfer(null, null).transferMoney(fromAcct, toAcct, amount);
+                    } catch (RuntimeException ignored) {
+                    }
                 }
             }
         }
@@ -125,5 +155,14 @@ class DemonstrateNoDeadlock {
         for (int i = 0; i < NUM_THREADS; i++) {
             new TransferThread().start();
         }
+        try {
+            TimeUnit.SECONDS.sleep(5);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+//        System.out.println(in1);
+//        System.out.println(in2);
+        System.out.println(Transfer.in1);
+        System.out.println(Transfer.in2);
     }
 }
