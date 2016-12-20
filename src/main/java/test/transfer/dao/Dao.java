@@ -1,17 +1,60 @@
 package test.transfer.dao;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.Properties;
 
 import static java.lang.String.format;
 
 public class Dao {
-    public static void main(String[] args) throws ClassNotFoundException, SQLException {
-        db();
+
+    private static final String PROP_FILE_NAME = "sql.xml";
+    private static final String DB_DRIVER_CLASS_NAME = "dbClass";
+    private static final String DB_NAME = "dbName";
+    private static final String SCHEMA = "%SCHEMA%";
+    private static final Properties prop = getProperties();
+
+    private static Properties getProperties() {
+        Properties prop = new Properties();
+        InputStream in = Dao.class.getClassLoader().getResourceAsStream(PROP_FILE_NAME);
+        try {
+            prop.loadFromXML(in);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return prop;
+    }
+
+    public static void main(String[] args) throws Exception {
+        new Dao().upAccBal();
+//        db();
+    }
+
+    public void upAccBal() throws Exception {
+        String dbClass = prop.getProperty(DB_DRIVER_CLASS_NAME);
+        String dbName = prop.getProperty(DB_NAME);
+        String dbUrl = prop.getProperty("dbUrl") + dbName;
+        String user = prop.getProperty("user");
+        String password = prop.getProperty("password");
+        String accNum = "1234";
+        String balance = "100.46";
+        upAccBal(dbClass, dbUrl, dbName, user, password, accNum, balance);
+    }
+
+    public static void upAccBal(String dbClass, String dbUrl, String dbName, String user, String password, String accNum, String balance) throws Exception {
+        Class.forName(dbClass);
+        try (Connection cn = DriverManager.getConnection(dbUrl, user, password)) {
+            PreparedStatement upAccBal = cn.prepareStatement(prop.getProperty("updateAccountBalance").replace(SCHEMA, dbName));
+            upAccBal.setString(1, balance);
+            upAccBal.setString(2, accNum);
+            upAccBal.execute();
+        }
     }
 
     public static void db() throws ClassNotFoundException, SQLException {

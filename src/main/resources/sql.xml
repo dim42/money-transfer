@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE properties SYSTEM "http://java.sun.com/dtd/properties.dtd">
+<properties>
+    <entry key="dbClass">org.h2.Driver</entry>
+    <entry key="dbName">mt_test</entry>
+    <entry key="dbUrl">jdbc:h2:~/</entry>
+    <entry key="user">sa</entry>
+    <entry key="password"/>
+    <entry key="updateAccountBalance">
+UPDATE %SCHEMA%.accounts
+SET balance = ?
+WHERE num = ?
+    </entry>
+</properties>
