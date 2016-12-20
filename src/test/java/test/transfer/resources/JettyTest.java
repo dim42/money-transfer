@@ -12,6 +12,7 @@ import javax.ws.rs.client.WebTarget;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 
+import static java.lang.String.format;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static org.junit.Assert.assertEquals;
 import static test.transfer.resources.JerseyClient.getWebTarget;
@@ -21,6 +22,7 @@ import static test.transfer.resources.ResultCode.OK;
 public class JettyTest {
 
     private static final Logger log = LogManager.getLogger();
+    private static final String PROTOCOL = "http";
 
     private Server server;
     private WebTarget target;
@@ -32,7 +34,7 @@ public class JettyTest {
         server = JettyServer.createServer(address);
         server.start();
 
-        target = getWebTarget(String.format("http://%s:%s/", inetAddress.getHostName(), JETTY_PORT));
+        target = getWebTarget(format("%s://%s:%s", PROTOCOL, inetAddress.getHostName(), JETTY_PORT));
     }
 
     @After
@@ -49,7 +51,7 @@ public class JettyTest {
         log.info("test started");
         String from = "1234";
         String to = "1235";
-        String amount = "-100.606";
+        String amount = "100.606";
         String cur = "RUR";
         TransferRequest rq = new TransferRequest(from, to, amount, cur);
 

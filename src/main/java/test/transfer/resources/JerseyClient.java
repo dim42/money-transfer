@@ -16,6 +16,7 @@ import javax.ws.rs.core.Response;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
+import static java.lang.String.format;
 import static javax.ws.rs.core.Response.Status.OK;
 import static test.transfer.resources.JettyServer.JETTY_PORT;
 
@@ -39,7 +40,7 @@ public class JerseyClient {
 //        GenericResponseDto entity = response.getEntity(GenericResponseDto.class);
 //        Object entity = response.getEntity();
         InetAddress inetAddress = InetAddress.getLocalHost();
-        WebTarget target = getWebTarget(String.format("http://%s:%s/", inetAddress.getHostName(), JETTY_PORT));
+        WebTarget target = getWebTarget(format("http://%s:%s/", inetAddress.getHostName(), JETTY_PORT));
         Response response = target.request().get();
         if (response.getStatus() != OK.getStatusCode()) {
             throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());

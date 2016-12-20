@@ -7,17 +7,22 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 
+import static java.lang.String.format;
+
 public class Dao {
     public static void main(String[] args) throws ClassNotFoundException, SQLException {
+        db();
+    }
+
+    public static void db() throws ClassNotFoundException, SQLException {
         Connection connection = null;
-//        Statement statement = null;
         PreparedStatement statement = null;
         String user = "user";
         String password = "";
         Class.forName(org.h2.Driver.class.getName());
-        String url = "jdbc:h2:~/test";
-//        connection = DriverManager.getConnection(url, user, password);
-        connection = DriverManager.getConnection(url);
+        String dbUrl = "jdbc:h2:~/mt_test";
+//        connection = DriverManager.getConnection(dbUrl, user, password);
+        connection = DriverManager.getConnection(dbUrl, "sa", "");
 //        statement = connection.createStatement();
 //        String select="SELECT * ";
         String select = "show databases;";
@@ -27,7 +32,7 @@ public class Dao {
         int columnAmount = rsmd.getColumnCount();
         StringBuilder result = new StringBuilder();
         for (int i = 1; i <= columnAmount; i++) {
-            result.append(String.format("%1$10s",
+            result.append(format("%1$10s",
                     rsmd.getColumnLabel(i)));
             if (i != columnAmount)
                 result.append("   ");
@@ -37,7 +42,7 @@ public class Dao {
             int i = 1;
             while (true) {
                 try {
-                    String str = String.format("%1$10s", rs.getString(i++));
+                    String str = format("%1$10s", rs.getString(i++));
                     if (i != 2) {
                         result.append("   ");
                     }
