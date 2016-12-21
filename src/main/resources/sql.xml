@@ -23,7 +23,7 @@ CREATE TABLE %SCHEMA%.accounts (
 INSERT INTO %SCHEMA%.accounts VALUES (?, ?, ?, ?, ?)
     </entry>
     <entry key="findAccount">
-SELECT * INTO %SCHEMA%.accounts
+SELECT * FROM %SCHEMA%.accounts
 WHERE num = ?
     </entry>
     <entry key="updateAccountBalance">
