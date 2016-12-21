@@ -108,7 +108,7 @@ public class Account {
     }
 
     public void credit(BigDecimal amount) {
-        balance = balance == null ? amount : balance.add(balance);
+        balance = balance == null ? amount : balance.add(amount);
     }
 
     public void checkInsufficientBalance(BigDecimal amount) {

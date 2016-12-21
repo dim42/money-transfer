@@ -51,7 +51,7 @@ public class TransferService {
         toAcct.credit(amount);
     }
 
-    public void transferMoney(final Account fromAcct, final Account toAcct, final BigDecimal transferAmount) {
+    public void transferMoney(final Account fromAcct, final Account toAcct, final BigDecimal amount) {
         if (fromAcct.number.equals(toAcct.number)) {
             throw new RuntimeException("The same account number.");
 //            return;
@@ -59,25 +59,30 @@ public class TransferService {
 
         class Helper {
             private void doTransfer() {
-//                if (fromAcct.balance != null && fromAcct.balance.compareTo(transferAmount) > 0) {
-//                    fromAcct.balance = fromAcct.balance.subtract(transferAmount);
-//                    toAcct.balance = toAcct.balance == null ? transferAmount : toAcct.balance.add(transferAmount);
+//                if (fromAcct.balance != null && fromAcct.balance.compareTo(amount) > 0) {
+//                    fromAcct.balance = fromAcct.balance.subtract(amount);
+//                    toAcct.balance = toAcct.balance == null ? amount : toAcct.balance.add(amount);
 //                }
-                if (fromAcct.balance() != null && fromAcct.balance().compareTo(transferAmount) > 0) {
-                    fromAcct.balance(fromAcct.balance().subtract(transferAmount));
-                    toAcct.balance(toAcct.balance() == null ? transferAmount : toAcct.balance().add(transferAmount));
-                }
+//                if (fromAcct.balance() != null && fromAcct.balance().compareTo(amount) > 0) {
+//                    fromAcct.balance(fromAcct.balance().subtract(amount));
+//                    toAcct.balance(toAcct.balance() == null ? amount : toAcct.balance().add(amount));
+//                }
+                fromAcct.checkInsufficientBalance(amount);
+                fromAcct.debit(amount);
+                toAcct.credit(amount);
             }
         }
 
         if (fromAcct.number.compareTo(toAcct.number) > 0) {
             synchronized (fromAcct) {
                 synchronized (toAcct) {
-//                    doTransfer(fromAcct, toAcct, transferAmount);
+//                    doTransfer(fromAcct, toAcct, amount);
                     new Helper().doTransfer();
                 }
             }
-        } else {
+        } else
+
+        {
             synchronized (toAcct) {
                 synchronized (fromAcct) {
                     new Helper().doTransfer();
