@@ -1,18 +1,17 @@
 package test.transfer.model;
 
 import java.math.BigDecimal;
-import java.util.concurrent.atomic.AtomicInteger;
 
-public class Transfer {
+public class TransferService {
 
     private static final Object tieLock = new Object();
     private final Account fromAcct;
     private final Account toAcct;
 
-    static AtomicInteger in1 = new AtomicInteger(0);
-    static AtomicInteger in2 = new AtomicInteger(0);
+//    static AtomicInteger in1 = new AtomicInteger(0);
+//    static AtomicInteger in2 = new AtomicInteger(0);
 
-    public Transfer(Account fromAcct, Account toAcct) {
+    public TransferService(Account fromAcct, Account toAcct) {
         this.fromAcct = fromAcct;
         this.toAcct = toAcct;
     }
@@ -30,14 +29,14 @@ public class Transfer {
         if (fromAcct.greater(toAcct)) {
             synchronized (fromAcct) {
                 synchronized (toAcct) {
-                    in1.incrementAndGet();
+//                    in1.incrementAndGet();
                     doTransfer(transferAmount);
                 }
             }
         } else {
             synchronized (toAcct) {
                 synchronized (fromAcct) {
-                    in2.incrementAndGet();
+//                    in2.incrementAndGet();
 //                    doTransfer(fromAcct, toAcct, transferAmount);
                     doTransfer(transferAmount);
                 }
@@ -54,15 +53,19 @@ public class Transfer {
 
     public void transferMoney(final Account fromAcct, final Account toAcct, final BigDecimal transferAmount) {
         if (fromAcct.number.equals(toAcct.number)) {
-//            throw new RuntimeException("The same account number.");
-            return;
+            throw new RuntimeException("The same account number.");
+//            return;
         }
 
         class Helper {
             private void doTransfer() {
-                if (fromAcct.balance != null && fromAcct.balance.compareTo(transferAmount) > 0) {
-                    fromAcct.balance = fromAcct.balance.subtract(transferAmount);
-                    toAcct.balance = toAcct.balance == null ? transferAmount : toAcct.balance.add(transferAmount);
+//                if (fromAcct.balance != null && fromAcct.balance.compareTo(transferAmount) > 0) {
+//                    fromAcct.balance = fromAcct.balance.subtract(transferAmount);
+//                    toAcct.balance = toAcct.balance == null ? transferAmount : toAcct.balance.add(transferAmount);
+//                }
+                if (fromAcct.balance() != null && fromAcct.balance().compareTo(transferAmount) > 0) {
+                    fromAcct.balance(fromAcct.balance().subtract(transferAmount));
+                    toAcct.balance(toAcct.balance() == null ? transferAmount : toAcct.balance().add(transferAmount));
                 }
             }
         }
@@ -81,7 +84,7 @@ public class Transfer {
                 }
             }
         }
-        in1.incrementAndGet();
+//        in1.incrementAndGet();
     }
 
 

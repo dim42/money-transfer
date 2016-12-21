@@ -3,7 +3,7 @@ package test.transfer.resources;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import test.transfer.model.Account;
-import test.transfer.model.Transfer;
+import test.transfer.model.TransferService;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -32,7 +32,7 @@ public class JettyResource {
             BigDecimal amount = new BigDecimal(request.getAmount());
             Account fromAcct = new Account(request.getFrom());
             Account toAcct = new Account(request.getTo());
-            new Transfer(fromAcct, toAcct).transferMoney(amount);
+            new TransferService(fromAcct, toAcct).transferMoney(amount);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return new TransferResponse(FAIL, e.getMessage());
@@ -52,7 +52,7 @@ public class JettyResource {
             //User from = findUser(request.getFrom());
             Account fromAcct = null;//fromUser.getAccount();
             Account toAcct = new Account(request.getTo());
-            new Transfer(fromAcct, toAcct).transferMoney(amount);
+            new TransferService(fromAcct, toAcct).transferMoney(amount);
         } catch (Exception e) {
             return new TransferResponse(FAIL, e.getMessage());
         }
