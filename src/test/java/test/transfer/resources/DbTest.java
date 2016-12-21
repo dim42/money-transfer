@@ -1,5 +1,7 @@
 package test.transfer.resources;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import test.transfer.util.PropertiesHelper;
 
@@ -17,18 +19,28 @@ public class DbTest {
     private static final String DB_DRIVER_CLASS_NAME = "dbClass";
     private static final PropertiesHelper prop = new PropertiesHelper(DbTest.class, PROP_FILE_NAME);
 
+    @Before
+    public void setUp() throws Exception {
+        cleanTestDB();
+    }
+
     @Test
-    public void testTransfer() throws Exception {
+    public void testCreateDBInsert() throws Exception {
+        createTestDB();
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        cleanTestDB();
+    }
+
+    public static void createTestDB() throws Exception {
         String dbClass = prop.get(DB_DRIVER_CLASS_NAME);
+        Class.forName(dbClass);
         String dbName = prop.get(DB_NAME);
         String dbUrl = prop.get("dbUrl") + dbName;
         String user = prop.get("user");
         String password = prop.get("password");
-        createTestDB(dbClass, dbUrl, dbName, user, password);
-    }
-
-    public static void createTestDB(String dbClass, String dbUrl, String dbName, String user, String password) throws Exception {
-        Class.forName(dbClass);
         try (Connection cn = DriverManager.getConnection(dbUrl, user, password)) {
             cn.prepareStatement(prop.get("dropAll")).execute();
 
@@ -76,8 +88,13 @@ public class DbTest {
         }
     }
 
-    private static void cleanTestDB(String dbClass, String dbUrl, String dbName, String user, String password) throws Exception {
+    public static void cleanTestDB() throws Exception {
+        String dbClass = prop.get(DB_DRIVER_CLASS_NAME);
         Class.forName(dbClass);
+        String dbName = prop.get(DB_NAME);
+        String dbUrl = prop.get("dbUrl") + dbName;
+        String user = prop.get("user");
+        String password = prop.get("password");
         try (Connection cn = DriverManager.getConnection(dbUrl, user, password)) {
             cn.prepareStatement(prop.get("dropAll")).execute();
         }
