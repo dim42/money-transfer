@@ -1,5 +1,7 @@
 package test.transfer.resources;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -8,10 +10,14 @@ import test.transfer.util.PropertiesHelper;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.function.BiConsumer;
 
 import static java.lang.String.format;
 
 public class DbTest {
+
+    private static final Logger log = LogManager.getLogger();
 
     private static final String PROP_FILE_NAME = "test_sql.xml";
     private static final String DB_NAME = "dbName";
@@ -25,78 +31,109 @@ public class DbTest {
     }
 
     @Test
-    public void testCreateDBInsert() throws Exception {
+    public void testCreateDBInsertData() throws Exception {
         createTestDB();
+        insertTestData();
     }
 
     @After
-    public void tearDown() throws Exception {
+    public void tearDown() {
         cleanTestDB();
     }
 
-    public static void createTestDB() throws Exception {
+    public static void createTestDB() {
+        getConnectionAndExecute((cn, dbName) -> {
+            try {
+                cn.prepareStatement(format("%s %s", prop.get("createSchema"), dbName)).execute();
+                cn.prepareStatement(prop.get("createUsers").replace(SCHEMA, dbName)).execute();
+                cn.prepareStatement(prop.get("createAccounts").replace(SCHEMA, dbName)).execute();
+                cn.prepareStatement(prop.get("createCurRates").replace(SCHEMA, dbName)).execute();
+            } catch (SQLException e) {
+                log.error(e.getMessage(), e);
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    public static void insertTestData() {
+        getConnectionAndExecute((cn, dbName) -> {
+            try {
+                int ind = 0;
+                PreparedStatement pstmt = cn.prepareStatement(prop.get("insertUsers").replace(SCHEMA, dbName));
+                pstmt.setInt(++ind, 1);
+                pstmt.setString(++ind, "user1");
+                pstmt.execute();
+                ind = 0;
+                pstmt.setInt(++ind, 2);
+                pstmt.setString(++ind, "user2");
+                pstmt.execute();
+
+                ind = 0;
+                pstmt = cn.prepareStatement(prop.get("insertAccounts").replace(SCHEMA, dbName));
+                pstmt.setString(++ind, "1234");
+                pstmt.setString(++ind, "20");
+                pstmt.setInt(++ind, 1);
+                pstmt.setBoolean(++ind, true);
+                pstmt.setString(++ind, "100");
+                pstmt.execute();
+                ind = 0;
+                pstmt.setString(++ind, "2222");
+                pstmt.setString(++ind, "130");
+                pstmt.setInt(++ind, 2);
+                pstmt.setBoolean(++ind, true);
+                pstmt.setString(++ind, "80");
+                pstmt.execute();
+
+                ind = 0;
+                pstmt = cn.prepareStatement(prop.get("insertCurRates").replace(SCHEMA, dbName));
+                pstmt.setInt(++ind, 1);
+                pstmt.setString(++ind, "RUB_EUR");
+                pstmt.setString(++ind, "65.21");
+                pstmt.execute();
+                ind = 0;
+                pstmt.setInt(++ind, 2);
+                pstmt.setString(++ind, "EUR_GBP");
+                pstmt.setString(++ind, "0.84");
+                pstmt.execute();
+            } catch (SQLException e) {
+                log.error(e.getMessage(), e);
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    private static void getConnectionAndExecute(BiConsumer<Connection, String> consumer) {
         String dbClass = prop.get(DB_DRIVER_CLASS_NAME);
-        Class.forName(dbClass);
+        classForName(dbClass);
         String dbName = prop.get(DB_NAME);
         String dbUrl = prop.get("dbUrl") + dbName;
         String user = prop.get("user");
         String password = prop.get("password");
         try (Connection cn = DriverManager.getConnection(dbUrl, user, password)) {
-            cn.prepareStatement(prop.get("dropAll")).execute();
-
-            int ind = 0;
-            cn.prepareStatement(format("%s %s", prop.get("createSchema"), dbName)).execute();
-            cn.prepareStatement(prop.get("createUsers").replace(SCHEMA, dbName)).execute();
-            PreparedStatement insertUsers = cn.prepareStatement(prop.get("insertUsers").replace(SCHEMA, dbName));
-            insertUsers.setInt(++ind, 1);
-            insertUsers.setString(++ind, "user1");
-            insertUsers.execute();
-            ind = 0;
-            insertUsers.setInt(++ind, 2);
-            insertUsers.setString(++ind, "user2");
-            insertUsers.execute();
-
-            ind = 0;
-            cn.prepareStatement(prop.get("createAccounts").replace(SCHEMA, dbName)).execute();
-            PreparedStatement insertAccounts = cn.prepareStatement(prop.get("insertAccounts").replace(SCHEMA, dbName));
-            insertAccounts.setString(++ind, "1234");
-            insertAccounts.setString(++ind, "20");
-            insertAccounts.setInt(++ind, 1);
-            insertAccounts.setBoolean(++ind, true);
-            insertAccounts.setString(++ind, "100");
-            insertAccounts.execute();
-            ind = 0;
-            insertAccounts.setString(++ind, "2222");
-            insertAccounts.setString(++ind, "130");
-            insertAccounts.setInt(++ind, 2);
-            insertAccounts.setBoolean(++ind, true);
-            insertAccounts.setString(++ind, "80");
-            insertAccounts.execute();
-
-            ind = 0;
-            cn.prepareStatement(prop.get("createCurRates").replace(SCHEMA, dbName)).execute();
-            PreparedStatement insertCurRates = cn.prepareStatement(prop.get("insertCurRates").replace(SCHEMA, dbName));
-            insertCurRates.setInt(++ind, 1);
-            insertCurRates.setString(++ind, "RUB_EUR");
-            insertCurRates.setString(++ind, "65.21");
-            insertCurRates.execute();
-            ind = 0;
-            insertCurRates.setInt(++ind, 2);
-            insertCurRates.setString(++ind, "EUR_GBP");
-            insertCurRates.setString(++ind, "0.84");
-            insertCurRates.execute();
+            consumer.accept(cn, dbName);
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e);
         }
     }
 
-    public static void cleanTestDB() throws Exception {
-        String dbClass = prop.get(DB_DRIVER_CLASS_NAME);
-        Class.forName(dbClass);
-        String dbName = prop.get(DB_NAME);
-        String dbUrl = prop.get("dbUrl") + dbName;
-        String user = prop.get("user");
-        String password = prop.get("password");
-        try (Connection cn = DriverManager.getConnection(dbUrl, user, password)) {
-            cn.prepareStatement(prop.get("dropAll")).execute();
+    private static void classForName(String dbClass) {
+        try {
+            Class.forName(dbClass);
+        } catch (ClassNotFoundException e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e);
         }
+    }
+
+    public static void cleanTestDB() {
+        getConnectionAndExecute((cn, dbName) -> {
+            try {
+                cn.prepareStatement(prop.get("dropAll")).execute();
+            } catch (SQLException e) {
+                log.error(e.getMessage(), e);
+                throw new RuntimeException(e);
+            }
+        });
     }
 }
