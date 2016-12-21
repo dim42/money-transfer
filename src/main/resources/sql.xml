@@ -6,9 +6,39 @@
     <entry key="dbUrl">jdbc:h2:~/</entry>
     <entry key="user">sa</entry>
     <entry key="password"/>
+    <entry key="insertUsers">
+INSERT INTO %SCHEMA%.users VALUES (?, ?)
+    </entry>
+    <entry key="createAccounts">
+CREATE TABLE %SCHEMA%.accounts (
+  num     VARCHAR(255) PRIMARY KEY,
+  balance VARCHAR(255),
+  user_id INT,
+  active  BOOL,
+  lim     VARCHAR(255),
+  FOREIGN KEY (user_id) REFERENCES users (id)
+)
+    </entry>
+    <entry key="insertAccounts">
+INSERT INTO %SCHEMA%.accounts VALUES (?, ?, ?, ?, ?)
+    </entry>
+    <entry key="findAccount">
+SELECT * INTO %SCHEMA%.accounts
+WHERE num = ?
+    </entry>
     <entry key="updateAccountBalance">
 UPDATE %SCHEMA%.accounts
 SET balance = ?
 WHERE num = ?
+    </entry>
+    <entry key="createCurRates">
+CREATE TABLE %SCHEMA%.cur_rates (
+  id   INT PRIMARY KEY,
+  c2c  VARCHAR(255) UNIQUE,
+  rate VARCHAR(255)
+)
+    </entry>
+    <entry key="insertCurRates">
+INSERT INTO %SCHEMA%.cur_rates VALUES (?, ?, ?)
     </entry>
 </properties>
