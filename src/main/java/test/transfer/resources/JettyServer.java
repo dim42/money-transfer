@@ -7,10 +7,16 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.servlet.ServletContainer;
+import test.transfer.api.TransferService;
+import test.transfer.dao.AccountDaoImpl;
+import test.transfer.dao.DBManagerImpl;
+import test.transfer.service.TransferServiceImpl;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
+
+import static test.transfer.api.DBManager.PROP_FILE_NAME;
 
 public class JettyServer {
 
@@ -42,5 +48,11 @@ public class JettyServer {
         holder.setInitParameter(ServerProperties.PROVIDER_CLASSNAMES, JettyResource.class.getCanonicalName());
         context.addServlet(holder, "/*");
         return server;
+    }
+
+    public static TransferService getServer() {
+        return new TransferServiceImpl(
+                new AccountDaoImpl(
+                        new DBManagerImpl(PROP_FILE_NAME)));
     }
 }

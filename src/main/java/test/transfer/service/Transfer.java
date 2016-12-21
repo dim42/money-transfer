@@ -1,22 +1,29 @@
-package test.transfer.model;
+package test.transfer.service;
+
+import test.transfer.api.AccountDao;
+import test.transfer.model.Account;
 
 import java.math.BigDecimal;
 
-public class TransferService {
+public class Transfer {
 
     private static final Object tieLock = new Object();
+    private final AccountDao accountDao;
     private final Account fromAcct;
     private final Account toAcct;
+    private final BigDecimal amount;
 
 //    static AtomicInteger in1 = new AtomicInteger(0);
 //    static AtomicInteger in2 = new AtomicInteger(0);
 
-    public TransferService(Account fromAcct, Account toAcct) {
+    public Transfer(AccountDao accountDao, Account fromAcct, Account toAcct, BigDecimal amount) {
+        this.accountDao = accountDao;
         this.fromAcct = fromAcct;
         this.toAcct = toAcct;
+        this.amount = amount;
     }
 
-//    public void transferMoney(BigDecimal balance) {
+//    public void run(BigDecimal balance) {
 //        BigDecimal fromAmount = fromAcct.getAmount();
 //        if (fromAmount != null && fromAmount.compareTo(balance) > 0) {
 //            fromAcct.setAmount(fromAmount.subtract(balance));
@@ -25,34 +32,39 @@ public class TransferService {
 //        }
 //    }
 
-    public void transferMoney(BigDecimal transferAmount) {
+    public void run() {
+//        if (fromAcct.getNumber().equals(toAcct.getNumber())) {
+//            throw new RuntimeException("The same account number.");
+////            return;
+//        }
         if (fromAcct.greater(toAcct)) {
             synchronized (fromAcct) {
                 synchronized (toAcct) {
 //                    in1.incrementAndGet();
-                    doTransfer(transferAmount);
+                    doTransfer();
                 }
             }
         } else {
             synchronized (toAcct) {
                 synchronized (fromAcct) {
 //                    in2.incrementAndGet();
-//                    doTransfer(fromAcct, toAcct, transferAmount);
-                    doTransfer(transferAmount);
+//                    doTransfer(fromAcct, toAcct, amount);
+                    doTransfer();
                 }
             }
         }
     }
 
     //    private void doTransfer(Account fromAcct, Account toAcct, BigDecimal amount) {
-    private void doTransfer(BigDecimal amount) {
+    private void doTransfer() {
         fromAcct.checkInsufficientBalance(amount);
         fromAcct.debit(amount);
         toAcct.credit(amount);
+        accountDao.updateAccountsBalance(fromAcct.getNumber(), fromAcct.getBalance().toString(), toAcct.getNumber(), toAcct.getBalance().toString());
     }
 
-    public void transferMoney(final Account fromAcct, final Account toAcct, final BigDecimal amount) {
-        if (fromAcct.number.equals(toAcct.number)) {
+    public void run(final Account fromAcct, final Account toAcct, final BigDecimal amount) {
+        if (fromAcct.getNumber().equals(toAcct.getNumber())) {
             throw new RuntimeException("The same account number.");
 //            return;
         }
@@ -73,16 +85,15 @@ public class TransferService {
             }
         }
 
-        if (fromAcct.number.compareTo(toAcct.number) > 0) {
+//        if (fromAcct.getNumber().compareTo(toAcct.getNumber()) > 0) {
+        if (fromAcct.greater(toAcct)) {
             synchronized (fromAcct) {
                 synchronized (toAcct) {
 //                    doTransfer(fromAcct, toAcct, amount);
                     new Helper().doTransfer();
                 }
             }
-        } else
-
-        {
+        } else {
             synchronized (toAcct) {
                 synchronized (fromAcct) {
                     new Helper().doTransfer();

@@ -1,13 +1,11 @@
 package test.transfer.resources;
 
 import org.junit.Test;
+import test.transfer.util.PropertiesHelper;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
-import java.util.Properties;
 
 import static java.lang.String.format;
 
@@ -16,39 +14,28 @@ public class DbTest {
     private static final String PROP_FILE_NAME = "test_sql.xml";
     private static final String DB_NAME = "dbName";
     private static final String SCHEMA = "%SCHEMA%";
-    private static final Properties prop = getProperties();
     private static final String DB_DRIVER_CLASS_NAME = "dbClass";
-
-    private static Properties getProperties() {
-        Properties prop = new Properties();
-        InputStream in = DbTest.class.getClassLoader().getResourceAsStream(PROP_FILE_NAME);
-        try {
-            prop.loadFromXML(in);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return prop;
-    }
+    private static final PropertiesHelper prop = new PropertiesHelper(DbTest.class, PROP_FILE_NAME);
 
     @Test
     public void testTransfer() throws Exception {
-        String dbClass = prop.getProperty(DB_DRIVER_CLASS_NAME);
-        String dbName = prop.getProperty(DB_NAME);
-        String dbUrl = prop.getProperty("dbUrl") + dbName;
-        String user = prop.getProperty("user");
-        String password = prop.getProperty("password");
+        String dbClass = prop.get(DB_DRIVER_CLASS_NAME);
+        String dbName = prop.get(DB_NAME);
+        String dbUrl = prop.get("dbUrl") + dbName;
+        String user = prop.get("user");
+        String password = prop.get("password");
         createTestDB(dbClass, dbUrl, dbName, user, password);
     }
 
     public static void createTestDB(String dbClass, String dbUrl, String dbName, String user, String password) throws Exception {
         Class.forName(dbClass);
         try (Connection cn = DriverManager.getConnection(dbUrl, user, password)) {
-            cn.prepareStatement(prop.getProperty("dropAll")).execute();
+            cn.prepareStatement(prop.get("dropAll")).execute();
 
             int ind = 0;
-            cn.prepareStatement(format("%s %s", prop.getProperty("createSchema"), dbName)).execute();
-            cn.prepareStatement(prop.getProperty("createUsers").replace(SCHEMA, dbName)).execute();
-            PreparedStatement insertUsers = cn.prepareStatement(prop.getProperty("insertUsers").replace(SCHEMA, dbName));
+            cn.prepareStatement(format("%s %s", prop.get("createSchema"), dbName)).execute();
+            cn.prepareStatement(prop.get("createUsers").replace(SCHEMA, dbName)).execute();
+            PreparedStatement insertUsers = cn.prepareStatement(prop.get("insertUsers").replace(SCHEMA, dbName));
             insertUsers.setInt(++ind, 1);
             insertUsers.setString(++ind, "user1");
             insertUsers.execute();
@@ -58,8 +45,8 @@ public class DbTest {
             insertUsers.execute();
 
             ind = 0;
-            cn.prepareStatement(prop.getProperty("createAccounts").replace(SCHEMA, dbName)).execute();
-            PreparedStatement insertAccounts = cn.prepareStatement(prop.getProperty("insertAccounts").replace(SCHEMA, dbName));
+            cn.prepareStatement(prop.get("createAccounts").replace(SCHEMA, dbName)).execute();
+            PreparedStatement insertAccounts = cn.prepareStatement(prop.get("insertAccounts").replace(SCHEMA, dbName));
             insertAccounts.setString(++ind, "1234");
             insertAccounts.setString(++ind, "20");
             insertAccounts.setInt(++ind, 1);
@@ -75,8 +62,8 @@ public class DbTest {
             insertAccounts.execute();
 
             ind = 0;
-            cn.prepareStatement(prop.getProperty("createCurRates").replace(SCHEMA, dbName)).execute();
-            PreparedStatement insertCurRates = cn.prepareStatement(prop.getProperty("insertCurRates").replace(SCHEMA, dbName));
+            cn.prepareStatement(prop.get("createCurRates").replace(SCHEMA, dbName)).execute();
+            PreparedStatement insertCurRates = cn.prepareStatement(prop.get("insertCurRates").replace(SCHEMA, dbName));
             insertCurRates.setInt(++ind, 1);
             insertCurRates.setString(++ind, "RUB_EUR");
             insertCurRates.setString(++ind, "65.21");
@@ -92,7 +79,7 @@ public class DbTest {
     private static void cleanTestDB(String dbClass, String dbUrl, String dbName, String user, String password) throws Exception {
         Class.forName(dbClass);
         try (Connection cn = DriverManager.getConnection(dbUrl, user, password)) {
-            cn.prepareStatement(prop.getProperty("dropAll")).execute();
+            cn.prepareStatement(prop.get("dropAll")).execute();
         }
     }
 }

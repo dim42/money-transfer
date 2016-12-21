@@ -1,17 +1,15 @@
-package test.transfer.dao.impl;
+package test.transfer.dao;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import test.transfer.dao.api.AccountDao;
-import test.transfer.dao.api.DBManager;
+import test.transfer.api.AccountDao;
+import test.transfer.api.DBManager;
 import test.transfer.model.Account;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-
-import static test.transfer.dao.impl.DBManagerImpl.PROP_FILE_NAME;
 
 public class AccountDaoImpl implements AccountDao {
 
@@ -23,8 +21,8 @@ public class AccountDaoImpl implements AccountDao {
     }
 
     public static void main(String[] args) throws Exception {
-        DBManager db = new DBManagerImpl(PROP_FILE_NAME);
-        new AccountDaoImpl(db).upAccBals("1234", "100.46", "4444", "200");
+        DBManager db = new DBManagerImpl(DBManager.PROP_FILE_NAME);
+        new AccountDaoImpl(db).updateAccountsBalance("1234", "100.46", "4444", "200");
     }
 
     @Override
@@ -37,7 +35,8 @@ public class AccountDaoImpl implements AccountDao {
             if (!first) {
                 throw new RuntimeException("Account is not found for num=" + accNum);
             }
-            Account account = new Account(rs.getString("num"));
+            Account account = new Account(rs.getString("num"), rs.getString("balance"), "currency", rs.getLong("user_id"), rs.getBoolean("active"), rs
+                    .getString("lim"));
             return account;
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
@@ -46,16 +45,16 @@ public class AccountDaoImpl implements AccountDao {
     }
 
     @Override
-    public void upAccBals(String accNum1, String balance1, String accNum2, String balance2) {
+    public void updateAccountsBalance(String accNum1, String balance1, String accNum2, String balance2) {
         try (Connection cn = db.getConnection()) {
             cn.setAutoCommit(false);
-            PreparedStatement upAccBal = cn.prepareStatement(db.getSql("updateAccountBalance"));
-            upAccBal.setString(1, balance1);
-            upAccBal.setString(2, accNum1);
-            upAccBal.execute();
-            upAccBal.setString(1, balance2);
-            upAccBal.setString(2, accNum2);
-            upAccBal.execute();
+            PreparedStatement stmt = cn.prepareStatement(db.getSql("updateAccountBalance"));
+            stmt.setString(1, balance1);
+            stmt.setString(2, accNum1);
+            stmt.execute();
+            stmt.setString(1, balance2);
+            stmt.setString(2, accNum2);
+            stmt.execute();
             cn.commit();
         } catch (SQLException e) {
             log.error(e.getMessage(), e);

@@ -1,4 +1,4 @@
-package test.transfer.dao.api;
+package test.transfer.api;
 
 import java.sql.Connection;
 

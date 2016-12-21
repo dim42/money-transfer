@@ -51,7 +51,7 @@ public class JettyTest {
         log.info("test started");
         String from = "1234";
         String to = "1235";
-        String amount = "100.606";
+        String amount = "99.606";
         String cur = "RUR";
         TransferRequest rq = new TransferRequest(from, to, amount, cur);
 
