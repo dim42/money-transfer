@@ -17,6 +17,10 @@ public class TransferResponse {
         this.message = message;
     }
 
+    public TransferResponse(ResultCode resultCode) {
+        this(resultCode, null);
+    }
+
     public String getResultCode() {
         return resultCode;
     }

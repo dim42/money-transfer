@@ -6,12 +6,9 @@ import test.transfer.model.Account;
 import test.transfer.model.Transfer;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 import java.math.BigDecimal;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
@@ -24,19 +21,11 @@ public class JettyResource {
 
     private static final Logger log = LogManager.getLogger();
 
-    @GET
-    @Path("/")
-    @Produces(MediaType.TEXT_PLAIN)
-    public String root() {
-        log.info("root:");
-        return "jetty root";
-    }
-
     @POST
     @Path("a2a")
     @Consumes({APPLICATION_JSON, APPLICATION_XML})
     @Produces({APPLICATION_JSON, APPLICATION_XML})
-    public TransferResponse transfer(TransferRequest request) {
+    public TransferResponse transferA2a(TransferRequest request) {
         log.info("request:" + request);
         try {
             request.validate();
@@ -45,21 +34,28 @@ public class JettyResource {
             Account toAcct = new Account(request.getTo());
             new Transfer(fromAcct, toAcct).transferMoney(amount);
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             return new TransferResponse(FAIL, e.getMessage());
         }
-        return new TransferResponse(OK, null);
+        return new TransferResponse(OK);
     }
 
-    @GET
-    @Path("/get2")
-    public String get2() {
-        log.info("get2:");
-        return "str";
-    }
-
-    @PUT
-    @Path("/put")
-    public void put() {
-        log.info("put:");
+    @POST
+    @Path("u2a")
+    @Consumes({APPLICATION_JSON, APPLICATION_XML})
+    @Produces({APPLICATION_JSON, APPLICATION_XML})
+    public TransferResponse transferU2a(TransferRequest request) {
+        try {
+            request.validate();
+            BigDecimal amount = new BigDecimal(request.getAmount());
+            // TODO
+            //User from = findUser(request.getFrom());
+            Account fromAcct = null;//fromUser.getAccount();
+            Account toAcct = new Account(request.getTo());
+            new Transfer(fromAcct, toAcct).transferMoney(amount);
+        } catch (Exception e) {
+            return new TransferResponse(FAIL, e.getMessage());
+        }
+        return new TransferResponse(OK);
     }
 }
