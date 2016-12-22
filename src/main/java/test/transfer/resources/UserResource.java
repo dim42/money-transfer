@@ -13,9 +13,11 @@ import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_XML;
 import static test.transfer.resources.ResultCode.FAIL;
 import static test.transfer.resources.ResultCode.OK;
+import static test.transfer.resources.UserResource.USER;
 
-@Path("user")
+@Path(USER)
 public class UserResource {
+    public static final String USER = "user";
     private static final Logger log = LogManager.getLogger();
 
     private UserService userService = AppContext.getUserService();
