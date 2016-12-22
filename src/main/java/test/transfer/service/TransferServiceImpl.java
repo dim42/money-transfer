@@ -7,19 +7,19 @@ import test.transfer.model.Account;
 import java.math.BigDecimal;
 
 public class TransferServiceImpl implements TransferService {
-    private final AccountDao accountDao;
+    private final AccountDao dao;
 
-    public TransferServiceImpl(AccountDao accountDao) {
-        this.accountDao = accountDao;
+    public TransferServiceImpl(AccountDao dao) {
+        this.dao = dao;
     }
 
     @Override
     public void transfer(String from, String to, BigDecimal amount) {
-        Account fromAcct = accountDao.findAccount(from);
+        Account fromAcct = dao.findAccount(from);
         fromAcct.checkActive();
         fromAcct.checkLimit(amount);
-        Account toAcct = accountDao.findAccount(from);
+        Account toAcct = dao.findAccount(from);
         toAcct.checkActive();
-        new Transfer(accountDao, fromAcct, toAcct, amount).run();
+        new Transfer(dao, fromAcct, toAcct, amount).run();
     }
 }

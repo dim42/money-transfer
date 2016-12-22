@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 
 import static java.math.BigDecimal.ZERO;
 import static java.math.RoundingMode.DOWN;
+import static test.transfer.util.Utils.requireNonBlank;
 
 @XmlRootElement
 public class TransferRequest {
@@ -67,12 +68,6 @@ public class TransferRequest {
         }
         if (new BigDecimal(amount).setScale(2, DOWN).compareTo(ZERO) < 0) {
             throw new IllegalArgumentException("Amount is negative");
-        }
-    }
-
-    private void requireNonBlank(String obj, String message) {
-        if (obj == null) {
-            throw new IllegalArgumentException(message);
         }
     }
 }

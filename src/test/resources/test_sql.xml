@@ -15,21 +15,22 @@ CREATE TABLE %SCHEMA%.users (
   name VARCHAR(255) UNIQUE
 )
     </entry>
-    <entry key="insertUsers">
+    <entry key="insertUser">
 INSERT INTO %SCHEMA%.users VALUES (?, ?)
     </entry>
     <entry key="createAccounts">
 CREATE TABLE %SCHEMA%.accounts (
-  num     VARCHAR(255) PRIMARY KEY,
-  balance VARCHAR(255),
-  user_id INT,
-  active  BOOL,
-  lim     VARCHAR(255),
+  num      VARCHAR(255) PRIMARY KEY,
+  balance  VARCHAR(255),
+  currency VARCHAR(255),
+  user_id  INT,
+  active   BOOL,
+  lim      VARCHAR(255),
   FOREIGN KEY (user_id) REFERENCES users (id)
 )
     </entry>
-    <entry key="insertAccounts">
-INSERT INTO %SCHEMA%.accounts VALUES (?, ?, ?, ?, ?)
+    <entry key="insertAccount">
+INSERT INTO %SCHEMA%.accounts VALUES (?, ?, ?, ?, ?, ?)
     </entry>
     <entry key="createCurRates">
 CREATE TABLE %SCHEMA%.cur_rates (
@@ -38,7 +39,7 @@ CREATE TABLE %SCHEMA%.cur_rates (
   rate VARCHAR(255)
 )
     </entry>
-    <entry key="insertCurRates">
+    <entry key="insertCurRate">
 INSERT INTO %SCHEMA%.cur_rates VALUES (?, ?, ?)
     </entry>
     <entry key="dropAll">

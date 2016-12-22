@@ -18,16 +18,18 @@ import static test.transfer.resources.ResultCode.OK;
 
 @Path("transfer")
 public class JettyResource {
-
     private static final Logger log = LogManager.getLogger();
 
-    private TransferService transferService = JettyServer.getServer();
+    private TransferService transferService = AppContext.getTransferService();
 
+    /**
+     * Money transferring from account to account.
+     */
     @POST
     @Path("a2a")
     @Consumes({APPLICATION_JSON, APPLICATION_XML})
     @Produces({APPLICATION_JSON, APPLICATION_XML})
-    public TransferResponse transferA2a(TransferRequest request) {
+    public CommonResponse transferA2a(TransferRequest request) {
         log.debug("transfer a2a started");
         try {
             request.validate();
@@ -35,16 +37,19 @@ public class JettyResource {
             transferService.transfer(request.getFrom(), request.getTo(), amount);
         } catch (Exception e) {
             log.error(e.getMessage(), e);
-            return new TransferResponse(FAIL, e.getMessage());
+            return new CommonResponse(FAIL, e.getMessage());
         }
-        return new TransferResponse(OK);
+        return new CommonResponse(OK);
     }
 
+    /**
+     * Money transferring from user to account.
+     */
     @POST
     @Path("u2a")
     @Consumes({APPLICATION_JSON, APPLICATION_XML})
     @Produces({APPLICATION_JSON, APPLICATION_XML})
-    public TransferResponse transferU2a(TransferRequest request) {
+    public CommonResponse transferU2a(TransferRequest request) {
         try {
             request.validate();
             BigDecimal amount = new BigDecimal(request.getAmount());
@@ -54,8 +59,8 @@ public class JettyResource {
 //            Account toAcct = new Account(request.getTo(), balance, currency, userId, isActive, limit);
 //            new Transfer(fromAcct, toAcct).run(amount);
         } catch (Exception e) {
-            return new TransferResponse(FAIL, e.getMessage());
+            return new CommonResponse(FAIL, e.getMessage());
         }
-        return new TransferResponse(OK);
+        return new CommonResponse(OK);
     }
 }

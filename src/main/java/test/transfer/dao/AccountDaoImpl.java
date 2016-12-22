@@ -11,6 +11,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+import static java.lang.String.format;
+
 public class AccountDaoImpl implements AccountDao {
 
     private static final Logger log = LogManager.getLogger();
@@ -20,24 +22,35 @@ public class AccountDaoImpl implements AccountDao {
         this.db = db;
     }
 
-    public static void main(String[] args) throws Exception {
-        DBManager db = new DBManagerImpl(DBManager.PROP_FILE_NAME);
-        new AccountDaoImpl(db).updateAccountsBalance("1234", "100.46", "4444", "200");
+    @Override
+    public void create(String number, String balance, String currency, Long userId, boolean active, String limit) {
+        try (Connection cn = db.getConnection()) {
+            PreparedStatement stmt = cn.prepareStatement(db.getSql("insertAccount"));
+            int ind = 0;
+            stmt.setString(++ind, number);
+            stmt.setString(++ind, balance);
+            stmt.setString(++ind, currency);
+            stmt.setLong(++ind, userId);
+            stmt.setBoolean(++ind, active);
+            stmt.setString(++ind, limit);
+            stmt.execute();
+        } catch (SQLException e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
-    public Account findAccount(String accNum) {
+    public Account findAccount(String number) {
         try (Connection cn = db.getConnection()) {
-            PreparedStatement upAccBal = cn.prepareStatement(db.getSql("findAccount"));
-            upAccBal.setString(1, accNum);
-            ResultSet rs = upAccBal.executeQuery();
+            PreparedStatement stmt = cn.prepareStatement(db.getSql("findAccount"));
+            stmt.setString(1, number);
+            ResultSet rs = stmt.executeQuery();
             boolean first = rs.first();
             if (!first) {
-                throw new RuntimeException("Account is not found for num=" + accNum);
+                throw new RuntimeException(format("Account (%s) is not found", number));
             }
-            Account account = new Account(rs.getString("num"), rs.getString("balance"), "currency", rs.getLong("user_id"), rs.getBoolean("active"), rs
-                    .getString("lim"));
-            return account;
+            return new Account(rs.getString("num"), rs.getString("balance"), "currency", rs.getLong("user_id"), rs.getBoolean("active"), rs.getString("lim"));
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e);

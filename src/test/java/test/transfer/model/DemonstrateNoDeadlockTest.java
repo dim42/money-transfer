@@ -20,8 +20,12 @@ public class DemonstrateNoDeadlockTest {
 
     private static final AccountDao accountDaoStub = new AccountDao() {
         @Override
-        public Account findAccount(String accNum) {
-            return new Account(accNum, String.valueOf(rnd.nextInt(1000) + 200_000_000), null, null, true, String.valueOf(rnd.nextInt(1000) + 300));
+        public void create(String number, String balance, String currency, Long userId, boolean active, String limit) {
+        }
+
+        @Override
+        public Account findAccount(String number) {
+            return new Account(number, String.valueOf(rnd.nextInt(1000) + 200_000_000), null, null, true, String.valueOf(rnd.nextInt(1000) + 300));
         }
 
         @Override
@@ -43,7 +47,7 @@ public class DemonstrateNoDeadlockTest {
                     int toInd = rnd.nextInt(NUM_ACCOUNTS);
                     Account fromAcct = accounts[fromInd];
                     Account toAcct = accounts[toInd];
-                    while (fromAcct.number.equals(toAcct.number)) {
+                    while (fromAcct.getNumber().equals(toAcct.getNumber())) {
                         toInd = rnd.nextInt(NUM_ACCOUNTS);
                         toAcct = accounts[toInd];
                     }

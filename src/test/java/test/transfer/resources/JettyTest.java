@@ -29,12 +29,34 @@ public class JettyTest {
 
     @Before
     public void setUp() throws Exception {
+        DbTest.cleanTestDB();
+        DbTest.createTestDB();
+
         InetAddress inetAddress = InetAddress.getLocalHost();
         InetSocketAddress address = new InetSocketAddress(inetAddress, JETTY_PORT);
         server = JettyServer.createServer(address);
         server.start();
 
         target = getWebTarget(format("%s://%s:%s", PROTOCOL, inetAddress.getHostName(), JETTY_PORT));
+
+        insertTestData();
+    }
+
+    private void insertTestData() {
+        long user1Id = 1L;
+        long user2Id = 2L;
+        UserRequest uRq = new UserRequest(user1Id, "user1");
+        CommonResponse response = target.path("user/create").request(APPLICATION_JSON_TYPE).post(Entity.entity(uRq, APPLICATION_JSON_TYPE),
+                CommonResponse.class);
+        uRq = new UserRequest(user2Id, "user2");
+        response = target.path("user/create").request(APPLICATION_JSON_TYPE).post(Entity.entity(uRq, APPLICATION_JSON_TYPE),
+                CommonResponse.class);
+        AccountRequest aRq = new AccountRequest("1234", "120.24", "RUR", user1Id, true, "100");
+        response = target.path("account/create").request(APPLICATION_JSON_TYPE).post(Entity.entity(aRq, APPLICATION_JSON_TYPE),
+                CommonResponse.class);
+        aRq = new AccountRequest("2222", "250.67", "RUR", user2Id, true, "150");
+        response = target.path("account/create").request(APPLICATION_JSON_TYPE).post(Entity.entity(aRq, APPLICATION_JSON_TYPE),
+                CommonResponse.class);
     }
 
     @After
@@ -44,6 +66,7 @@ public class JettyTest {
         } finally {
             server.destroy();
         }
+        DbTest.cleanTestDB();
     }
 
     @Test
@@ -55,8 +78,8 @@ public class JettyTest {
         String cur = "RUR";
         TransferRequest rq = new TransferRequest(from, to, amount, cur);
 
-        TransferResponse response = target.path("transfer/a2a").request(APPLICATION_JSON_TYPE).post(Entity.entity(rq, APPLICATION_JSON_TYPE),
-                TransferResponse.class);
+        CommonResponse response = target.path("transfer/a2a").request(APPLICATION_JSON_TYPE).post(Entity.entity(rq, APPLICATION_JSON_TYPE),
+                CommonResponse.class);
 
         assertEquals(response.getMessage(), OK.toString(), response.getResultCode());
     }

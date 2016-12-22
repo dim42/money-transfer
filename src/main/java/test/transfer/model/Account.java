@@ -8,14 +8,8 @@ import static java.math.RoundingMode.DOWN;
 
 public class Account {
 
-    final String number;
-    //    BigDecimal balance;
+    private final String number;
     private BigDecimal balance;
-
-    void balance(BigDecimal balance) {
-        this.balance = balance;
-    }
-
     private String currency;
     private Long userId;
     private boolean isActive;
