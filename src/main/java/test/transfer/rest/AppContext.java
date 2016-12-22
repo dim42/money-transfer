@@ -1,4 +1,4 @@
-package test.transfer.resources;
+package test.transfer.rest;
 
 import test.transfer.api.AccountService;
 import test.transfer.api.TransferService;

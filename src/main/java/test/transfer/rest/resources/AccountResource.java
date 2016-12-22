@@ -1,9 +1,12 @@
-package test.transfer.resources;
+package test.transfer.rest.resources;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import test.transfer.api.AccountService;
 import test.transfer.model.Account;
+import test.transfer.rest.AppContext;
+import test.transfer.rest.dto.AccountRequest;
+import test.transfer.rest.dto.CommonResponse;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -13,9 +16,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 import static javax.ws.rs.core.MediaType.*;
-import static test.transfer.resources.AccountResource.ACCOUNT;
-import static test.transfer.resources.ResultCode.FAIL;
-import static test.transfer.resources.ResultCode.OK;
+import static test.transfer.rest.resources.AccountResource.ACCOUNT;
+import static test.transfer.rest.dto.ResultCode.FAIL;
+import static test.transfer.rest.dto.ResultCode.OK;
 
 @Path(ACCOUNT)
 public class AccountResource {

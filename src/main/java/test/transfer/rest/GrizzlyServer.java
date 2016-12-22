@@ -1,8 +1,9 @@
-package test.transfer.resources;
+package test.transfer.rest;
 
 import org.glassfish.grizzly.http.server.HttpServer;
 import org.glassfish.jersey.grizzly2.httpserver.GrizzlyHttpServerFactory;
 import org.glassfish.jersey.server.ResourceConfig;
+import test.transfer.rest.resources.GrizzlyResource;
 
 import java.io.IOException;
 import java.net.URI;

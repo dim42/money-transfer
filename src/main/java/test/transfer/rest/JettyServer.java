@@ -1,4 +1,4 @@
-package test.transfer.resources;
+package test.transfer.rest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -7,6 +7,9 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.servlet.ServletContainer;
+import test.transfer.rest.resources.AccountResource;
+import test.transfer.rest.resources.TransferResource;
+import test.transfer.rest.resources.UserResource;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;

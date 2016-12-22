@@ -1,4 +1,4 @@
-package test.transfer.resources;
+package test.transfer.rest.resources;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;

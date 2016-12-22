@@ -1,8 +1,11 @@
-package test.transfer.resources;
+package test.transfer.rest.resources;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import test.transfer.api.UserService;
+import test.transfer.rest.AppContext;
+import test.transfer.rest.dto.CommonResponse;
+import test.transfer.rest.dto.UserRequest;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
@@ -11,9 +14,9 @@ import javax.ws.rs.Produces;
 
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.MediaType.APPLICATION_XML;
-import static test.transfer.resources.ResultCode.FAIL;
-import static test.transfer.resources.ResultCode.OK;
-import static test.transfer.resources.UserResource.USER;
+import static test.transfer.rest.dto.ResultCode.FAIL;
+import static test.transfer.rest.dto.ResultCode.OK;
+import static test.transfer.rest.resources.UserResource.USER;
 
 @Path(USER)
 public class UserResource {

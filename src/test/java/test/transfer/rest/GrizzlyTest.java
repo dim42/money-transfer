@@ -1,4 +1,4 @@
-package test.transfer.resources;
+package test.transfer.rest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

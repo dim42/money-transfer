@@ -1,4 +1,4 @@
-package test.transfer.resources;
+package test.transfer.rest.dto;
 
 public enum ResultCode {
     OK, FAIL

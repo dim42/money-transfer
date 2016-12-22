@@ -1,4 +1,4 @@
-package test.transfer.resources;
+package test.transfer.rest;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -6,6 +6,10 @@ import org.eclipse.jetty.server.Server;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import test.transfer.rest.dto.AccountRequest;
+import test.transfer.rest.dto.CommonResponse;
+import test.transfer.rest.dto.TransferRequest;
+import test.transfer.rest.dto.UserRequest;
 
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.WebTarget;
@@ -15,13 +19,13 @@ import java.net.InetSocketAddress;
 import static java.lang.String.format;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static org.junit.Assert.assertEquals;
-import static test.transfer.resources.AccountResource.ACCOUNT;
-import static test.transfer.resources.AccountResource.CREATE;
-import static test.transfer.resources.JerseyClient.getWebTarget;
-import static test.transfer.resources.JettyServer.JETTY_PORT;
-import static test.transfer.resources.ResultCode.FAIL;
-import static test.transfer.resources.ResultCode.OK;
-import static test.transfer.resources.UserResource.USER;
+import static test.transfer.rest.resources.AccountResource.ACCOUNT;
+import static test.transfer.rest.resources.AccountResource.CREATE;
+import static test.transfer.rest.JerseyClient.getWebTarget;
+import static test.transfer.rest.JettyServer.JETTY_PORT;
+import static test.transfer.rest.dto.ResultCode.FAIL;
+import static test.transfer.rest.dto.ResultCode.OK;
+import static test.transfer.rest.resources.UserResource.USER;
 
 public class TransferTest {
 

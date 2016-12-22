@@ -1,4 +1,4 @@
-package test.transfer.resources;
+package test.transfer.rest;
 
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.jackson.JacksonFeature;
@@ -10,9 +10,7 @@ import javax.ws.rs.core.Response;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 
-import static java.lang.String.format;
 import static javax.ws.rs.core.Response.Status.OK;
-import static test.transfer.resources.JettyServer.JETTY_PORT;
 
 public class JerseyClient {
 
@@ -22,7 +20,7 @@ public class JerseyClient {
 
     public static Response get() throws UnknownHostException {
         InetAddress inetAddress = InetAddress.getLocalHost();
-        WebTarget target = getWebTarget(format("http://%s:%s/", inetAddress.getHostName(), JETTY_PORT));
+        WebTarget target = getWebTarget(String.format("http://%s:%s/", inetAddress.getHostName(), JettyServer.JETTY_PORT));
         Response response = target.request().get();
         if (response.getStatus() != OK.getStatusCode()) {
             throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());

@@ -1,4 +1,4 @@
-package test.transfer.resources;
+package test.transfer.rest;
 
 import org.restlet.Client;
 import org.restlet.Context;
