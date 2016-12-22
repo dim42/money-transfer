@@ -23,7 +23,7 @@ public class UserResource {
     public static final String USER = "user";
     private static final Logger log = LogManager.getLogger();
 
-    private UserService userService = AppContext.getUserService();
+    private final UserService userService = AppContext.getUserService();
 
     @POST
     @Path("create")

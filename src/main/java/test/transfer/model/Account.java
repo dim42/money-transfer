@@ -10,8 +10,8 @@ public class Account {
 
     private final String number;
     private BigDecimal balance;
-    private String currency;
-    private Long userId;
+    private final String currency;
+    private final Long userId;
     private boolean isActive;
     private BigDecimal limit;
 

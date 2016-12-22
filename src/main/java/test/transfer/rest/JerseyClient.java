@@ -11,6 +11,7 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 
 import static javax.ws.rs.core.Response.Status.OK;
+import static test.transfer.rest.resources.AccountResource.ACCOUNT;
 
 public class JerseyClient {
 
@@ -21,7 +22,7 @@ public class JerseyClient {
     public static Response get() throws UnknownHostException {
         InetAddress inetAddress = InetAddress.getLocalHost();
         WebTarget target = getWebTarget(String.format("http://%s:%s/", inetAddress.getHostName(), JettyServer.JETTY_PORT));
-        Response response = target.request().get();
+        Response response = target.path(ACCOUNT + "/find").queryParam("number", "1234").request().get();
         if (response.getStatus() != OK.getStatusCode()) {
             throw new RuntimeException("Failed : HTTP error code : " + response.getStatus());
         }

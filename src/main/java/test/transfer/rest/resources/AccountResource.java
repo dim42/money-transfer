@@ -16,9 +16,9 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
 import static javax.ws.rs.core.MediaType.*;
-import static test.transfer.rest.resources.AccountResource.ACCOUNT;
 import static test.transfer.rest.dto.ResultCode.FAIL;
 import static test.transfer.rest.dto.ResultCode.OK;
+import static test.transfer.rest.resources.AccountResource.ACCOUNT;
 
 @Path(ACCOUNT)
 public class AccountResource {
@@ -27,7 +27,7 @@ public class AccountResource {
     public static final String FIND = "find";
     private static final Logger log = LogManager.getLogger();
 
-    private AccountService accountService = AppContext.getAccountService();
+    private final AccountService accountService = AppContext.getAccountService();
 
     @POST
     @Path(CREATE)

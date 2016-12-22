@@ -23,7 +23,7 @@ public class TransferResource {
     private static final Logger log = LogManager.getLogger();
     public static final String TRANSFER = "transfer";
 
-    private TransferService transferService = AppContext.getTransferService();
+    private final TransferService transferService = AppContext.getTransferService();
 
     /**
      * Money transferring from account to account.
