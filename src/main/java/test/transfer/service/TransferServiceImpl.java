@@ -18,7 +18,7 @@ public class TransferServiceImpl implements TransferService {
         Account fromAcct = dao.findAccount(from);
         fromAcct.checkActive();
         fromAcct.checkLimit(amount);
-        Account toAcct = dao.findAccount(from);
+        Account toAcct = dao.findAccount(to);
         toAcct.checkActive();
         new Transfer(dao, fromAcct, toAcct, amount).run();
     }
