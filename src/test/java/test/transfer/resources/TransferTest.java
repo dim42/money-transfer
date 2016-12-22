@@ -19,7 +19,7 @@ import static test.transfer.resources.JerseyClient.getWebTarget;
 import static test.transfer.resources.JettyServer.JETTY_PORT;
 import static test.transfer.resources.ResultCode.OK;
 
-public class JettyTest {
+public class TransferTest {
 
     private static final Logger log = LogManager.getLogger();
     private static final String PROTOCOL = "http";
