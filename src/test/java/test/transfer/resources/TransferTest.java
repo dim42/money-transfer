@@ -29,6 +29,8 @@ public class TransferTest {
     private static final String PROTOCOL = "http";
     private static final String FROM_ACC = "1234";
     private static final String TO_ACC = "2222";
+    private static final String NOT_ACTIVE_ACC = "3333";
+    private static final String CUR = "RUR";
 
     private Server server;
     private WebTarget target;
@@ -52,17 +54,15 @@ public class TransferTest {
         long user1Id = 1L;
         long user2Id = 2L;
         UserRequest uRq = new UserRequest(user1Id, "user1");
-        CommonResponse response = target.path(USER + "/" + CREATE).request(APPLICATION_JSON_TYPE).post(Entity.entity(uRq, APPLICATION_JSON_TYPE),
-                CommonResponse.class);
+        target.path(USER + "/" + CREATE).request(APPLICATION_JSON_TYPE).post(Entity.entity(uRq, APPLICATION_JSON_TYPE), CommonResponse.class);
         uRq = new UserRequest(user2Id, "user2");
-        response = target.path(USER + "/" + CREATE).request(APPLICATION_JSON_TYPE).post(Entity.entity(uRq, APPLICATION_JSON_TYPE),
-                CommonResponse.class);
-        AccountRequest aRq = new AccountRequest(FROM_ACC, "120.24", "RUR", user1Id, true, "100");
-        response = target.path(ACCOUNT + "/" + CREATE).request(APPLICATION_JSON_TYPE).post(Entity.entity(aRq, APPLICATION_JSON_TYPE),
-                CommonResponse.class);
-        aRq = new AccountRequest(TO_ACC, "250.67", "RUR", user2Id, true, "150");
-        response = target.path(ACCOUNT + "/" + CREATE).request(APPLICATION_JSON_TYPE).post(Entity.entity(aRq, APPLICATION_JSON_TYPE),
-                CommonResponse.class);
+        target.path(USER + "/" + CREATE).request(APPLICATION_JSON_TYPE).post(Entity.entity(uRq, APPLICATION_JSON_TYPE), CommonResponse.class);
+        AccountRequest aRq = new AccountRequest(FROM_ACC, "120.24", CUR, user1Id, true, "100");
+        target.path(ACCOUNT + "/" + CREATE).request(APPLICATION_JSON_TYPE).post(Entity.entity(aRq, APPLICATION_JSON_TYPE), CommonResponse.class);
+        aRq = new AccountRequest(TO_ACC, "250.67", CUR, user2Id, true, "260");
+        target.path(ACCOUNT + "/" + CREATE).request(APPLICATION_JSON_TYPE).post(Entity.entity(aRq, APPLICATION_JSON_TYPE), CommonResponse.class);
+        aRq = new AccountRequest(NOT_ACTIVE_ACC, "300", CUR, user2Id, false, "150");
+        target.path(ACCOUNT + "/" + CREATE).request(APPLICATION_JSON_TYPE).post(Entity.entity(aRq, APPLICATION_JSON_TYPE), CommonResponse.class);
     }
 
     @After
@@ -77,10 +77,8 @@ public class TransferTest {
 
     @Test
     public void testTransfer() {
-        log.info("test started");
-        String amount = "99.606";
-        String cur = "RUR";
-        TransferRequest rq = new TransferRequest(FROM_ACC, TO_ACC, amount, cur);
+        log.debug("test started");
+        TransferRequest rq = new TransferRequest(FROM_ACC, TO_ACC, "99.606", CUR);
 
         CommonResponse response = target.path("transfer/a2a").request(APPLICATION_JSON_TYPE).post(Entity.entity(rq, APPLICATION_JSON_TYPE),
                 CommonResponse.class);
@@ -88,20 +86,65 @@ public class TransferTest {
         assertEquals(response.getMessage(), OK.toString(), response.getResultCode());
         response = target.path("account/find").queryParam("number", FROM_ACC).request(APPLICATION_JSON_TYPE).get(CommonResponse.class);
         assertEquals(response.getMessage(), OK.toString(), response.getResultCode());
-        assertEquals("219.84", response.getMessage());
+        assertEquals("20.64", response.getMessage());
+        response = target.path("account/find").queryParam("number", TO_ACC).request(APPLICATION_JSON_TYPE).get(CommonResponse.class);
+        assertEquals(response.getMessage(), OK.toString(), response.getResultCode());
+        assertEquals("350.27", response.getMessage());
     }
 
     @Test
     public void testTransfer_theSameAccount() {
-        log.info("test started");
-        String amount = "99.606";
-        String cur = "RUR";
-        TransferRequest rq = new TransferRequest(FROM_ACC, FROM_ACC, amount, cur);
+        TransferRequest rq = new TransferRequest(FROM_ACC, FROM_ACC, "99.606", CUR);
 
         CommonResponse response = target.path("transfer/a2a").request(APPLICATION_JSON_TYPE).post(Entity.entity(rq, APPLICATION_JSON_TYPE),
                 CommonResponse.class);
 
         assertEquals(response.getMessage(), FAIL.toString(), response.getResultCode());
         assertEquals("Accounts are equal", response.getMessage());
+    }
+
+    @Test
+    public void testTransfer_negativeAmount() {
+        TransferRequest rq = new TransferRequest(FROM_ACC, TO_ACC, "-99.606", CUR);
+
+        CommonResponse response = target.path("transfer/a2a").request(APPLICATION_JSON_TYPE).post(Entity.entity(rq, APPLICATION_JSON_TYPE),
+                CommonResponse.class);
+
+        assertEquals(response.getMessage(), FAIL.toString(), response.getResultCode());
+        assertEquals("Amount is negative", response.getMessage());
+    }
+
+    @Test
+    public void testTransfer_exceedsLimit() {
+        TransferRequest rq = new TransferRequest(FROM_ACC, TO_ACC, "101", CUR);
+
+        CommonResponse response = target.path("transfer/a2a").request(APPLICATION_JSON_TYPE).post(Entity.entity(rq, APPLICATION_JSON_TYPE),
+                CommonResponse.class);
+
+        assertEquals(response.getMessage(), FAIL.toString(), response.getResultCode());
+        assertEquals("Transfer amount (101.00) exceeds account's (1234) limit (100.00)", response.getMessage());
+    }
+
+    @Test
+    public void testTransfer_notActiveAccount() {
+        TransferRequest rq = new TransferRequest(FROM_ACC, NOT_ACTIVE_ACC, "100", CUR);
+
+        CommonResponse response = target.path("transfer/a2a").request(APPLICATION_JSON_TYPE).post(Entity.entity(rq, APPLICATION_JSON_TYPE),
+                CommonResponse.class);
+
+        assertEquals(response.getMessage(), FAIL.toString(), response.getResultCode());
+        assertEquals("Account (3333) is not active", response.getMessage());
+    }
+
+
+    @Test
+    public void testTransfer_insufficientBalance() {
+        TransferRequest rq = new TransferRequest(TO_ACC, FROM_ACC, "251", CUR);
+
+        CommonResponse response = target.path("transfer/a2a").request(APPLICATION_JSON_TYPE).post(Entity.entity(rq, APPLICATION_JSON_TYPE),
+                CommonResponse.class);
+
+        assertEquals(response.getMessage(), FAIL.toString(), response.getResultCode());
+        assertEquals("Insufficient balance (250.67) for account:2222, required 251.00", response.getMessage());
     }
 }

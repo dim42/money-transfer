@@ -14,6 +14,7 @@ public class TransferRequest {
     private String to;
     private String amount;
     private String cur;
+    private BigDecimal amountNum;
 
     // JAXB needs this
     public TransferRequest() {
@@ -46,6 +47,10 @@ public class TransferRequest {
         return amount;
     }
 
+    public BigDecimal getAmountNum() {
+        return amountNum;
+    }
+
     public void setAmount(String amount) {
         this.amount = amount;
     }
@@ -66,7 +71,8 @@ public class TransferRequest {
         if (from.equals(to)) {
             throw new IllegalArgumentException("Accounts are equal");
         }
-        if (new BigDecimal(amount).setScale(2, DOWN).compareTo(ZERO) < 0) {
+        amountNum = new BigDecimal(this.amount).setScale(2, DOWN);
+        if (amountNum.compareTo(ZERO) < 0) {
             throw new IllegalArgumentException("Amount is negative");
         }
     }

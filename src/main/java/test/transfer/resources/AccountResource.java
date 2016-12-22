@@ -12,8 +12,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static javax.ws.rs.core.MediaType.APPLICATION_XML;
+import static javax.ws.rs.core.MediaType.*;
 import static test.transfer.resources.AccountResource.ACCOUNT;
 import static test.transfer.resources.ResultCode.FAIL;
 import static test.transfer.resources.ResultCode.OK;
@@ -46,8 +45,8 @@ public class AccountResource {
 
     @GET
     @Path(FIND)
-//    @Consumes({APPLICATION_JSON, APPLICATION_XML})
-//    @Produces({APPLICATION_JSON, APPLICATION_XML})
+    @Consumes(TEXT_PLAIN)
+    @Produces({APPLICATION_JSON, APPLICATION_XML})
     public CommonResponse find(@QueryParam("number") String number) {
         log.debug("find account started");
         try {
