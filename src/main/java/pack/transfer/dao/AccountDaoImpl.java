@@ -50,7 +50,8 @@ public class AccountDaoImpl implements AccountDao {
             if (!first) {
                 throw new RuntimeException(format("Account (%s) is not found", number));
             }
-            return new Account(rs.getString("num"), rs.getString("balance"), "currency", rs.getLong("user_id"), rs.getBoolean("active"), rs.getString("lim"));
+            return new Account(rs.getString("num"), rs.getString("balance"), rs.getString("currency"), rs.getLong("user_id"), rs.getBoolean("active"), rs
+                    .getString("lim"));
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e);

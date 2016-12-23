@@ -52,7 +52,8 @@ public class DemonstrateNoDeadlockTest {
                         toAcct = accounts[toInd];
                     }
                     try {
-                        new Transfer(accountDaoStub, fromAcct, toAcct, new BigDecimal(rnd.nextInt(100))).run();
+                        BigDecimal amount = new BigDecimal(rnd.nextInt(100));
+                        new Transfer(accountDaoStub, fromAcct, amount, toAcct, amount).run();
                     } finally {
                         latch.countDown();
                     }

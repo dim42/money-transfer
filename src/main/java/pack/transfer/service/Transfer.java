@@ -9,14 +9,16 @@ public class Transfer {
 
     private final AccountDao accountDao;
     private final Account fromAcct;
+    private final BigDecimal fromAmount;
     private final Account toAcct;
-    private final BigDecimal amount;
+    private final BigDecimal toAmount;
 
-    public Transfer(AccountDao accountDao, Account fromAcct, Account toAcct, BigDecimal amount) {
+    public Transfer(AccountDao accountDao, Account fromAcct, BigDecimal fromAmount, Account toAcct, BigDecimal toAmount) {
         this.accountDao = accountDao;
         this.fromAcct = fromAcct;
+        this.fromAmount = fromAmount;
         this.toAcct = toAcct;
-        this.amount = amount;
+        this.toAmount = toAmount;
     }
 
     public void run() {
@@ -36,9 +38,9 @@ public class Transfer {
     }
 
     private void doTransfer() {
-        fromAcct.checkInsufficientBalance(amount);
-        fromAcct.debit(amount);
-        toAcct.credit(amount);
+        fromAcct.checkInsufficientBalance(fromAmount);
+        fromAcct.debit(fromAmount);
+        toAcct.credit(toAmount);
         accountDao.updateAccountsBalance(fromAcct.getNumber(), fromAcct.getBalance().toString(), toAcct.getNumber(), toAcct.getBalance().toString());
     }
 }

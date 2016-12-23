@@ -24,4 +24,7 @@ WHERE num = ?
     <entry key="insertCurRate">
 INSERT INTO %SCHEMA%.cur_rates VALUES (?, ?, ?)
     </entry>
+    <entry key="allCurRates">
+SELECT * FROM %SCHEMA%.cur_rates
+    </entry>
 </properties>

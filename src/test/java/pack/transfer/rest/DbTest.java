@@ -74,7 +74,7 @@ public class DbTest {
                 stmt = cn.prepareStatement(prop.get("insertAccount").replace(SCHEMA, dbName));
                 stmt.setString(++ind, "1234");
                 stmt.setString(++ind, "20");
-                stmt.setString(++ind, "RUR");
+                stmt.setString(++ind, "RUB");
                 stmt.setInt(++ind, 1);
                 stmt.setBoolean(++ind, true);
                 stmt.setString(++ind, "100");
@@ -82,7 +82,7 @@ public class DbTest {
                 ind = 0;
                 stmt.setString(++ind, "2222");
                 stmt.setString(++ind, "130");
-                stmt.setString(++ind, "RUR");
+                stmt.setString(++ind, "RUB");
                 stmt.setInt(++ind, 2);
                 stmt.setBoolean(++ind, true);
                 stmt.setString(++ind, "80");

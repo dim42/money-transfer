@@ -32,6 +32,10 @@ public class Account {
         return number;
     }
 
+    public String getCurrency() {
+        return currency;
+    }
+
     public void debit(BigDecimal amount) {
         balance = balance.subtract(amount);
     }

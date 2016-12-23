@@ -36,7 +36,7 @@ public class TransferResource {
         log.debug("transfer a2a started");
         try {
             request.validate();
-            transferService.transfer(request.getFrom(), request.getTo(), request.getAmountNum());
+            transferService.transfer(request.getFrom(), request.getTo(), request.getCur(), request.getAmountNum());
         } catch (Exception e) {
             log.error(e.getMessage(), e);
             return new CommonResponse(FAIL, e.getMessage());

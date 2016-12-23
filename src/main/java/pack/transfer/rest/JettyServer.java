@@ -7,15 +7,11 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.servlet.ServletContainer;
-import pack.transfer.rest.resources.AccountResource;
-import pack.transfer.rest.resources.TransferResource;
 import pack.transfer.rest.resources.UserResource;
 
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.util.Arrays;
-
-import static java.lang.String.format;
 
 public class JettyServer {
 
@@ -44,8 +40,9 @@ public class JettyServer {
         ServletContextHandler context = new ServletContextHandler(server, "/", ServletContextHandler.SESSIONS);
         ServletHolder holder = new ServletHolder(ServletContainer.class);
         // Tells the Jersey Servlet which REST service/class to load.
-        holder.setInitParameter(ServerProperties.PROVIDER_CLASSNAMES, format("%s;%s;%s", UserResource.class.getName(), AccountResource.class.getName(),
-                TransferResource.class.getCanonicalName()));
+        holder.setInitParameter(ServerProperties.PROVIDER_PACKAGES, UserResource.class.getPackage().getName());
+//        holder.setInitParameter(ServerProperties.PROVIDER_CLASSNAMES, format("%s;%s;%s", UserResource.class.getName(), AccountResource.class.getName(),
+//                TransferResource.class.getCanonicalName()));
         context.addServlet(holder, "/*");
         return server;
     }
