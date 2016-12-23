@@ -76,7 +76,7 @@ public class TransferTest {
         } finally {
             server.destroy();
         }
-        DbTest.cleanTestDB();
+//        DbTest.cleanTestDB();
     }
 
     @Test
