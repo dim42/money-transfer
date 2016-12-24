@@ -33,13 +33,16 @@ public class CurRateServiceImpl implements CurRateService {
     public void sync() {
         List<CurRate> curRates = dao.allCurRates();
         curRates.forEach(curRate -> {
-            BigDecimal rate = new BigDecimal(curRate.getRate()).setScale(2, HALF_UP);
+            BigDecimal rate = new BigDecimal(curRate.getRate()).setScale(4, HALF_UP);
             cr.put(curRate.getC2c(), rate);
         });
     }
 
     @Override
     public BigDecimal convert(String currencyFrom, String currencyTo, BigDecimal amount) {
+        if (currencyFrom.equals(currencyTo)) {
+            return amount;
+        }
         BigDecimal curRate = cr.get(currencyFrom + DELIMITER + currencyTo);
         return amount.multiply(curRate).setScale(2, DOWN);
     }

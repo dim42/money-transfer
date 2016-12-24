@@ -74,13 +74,11 @@ public class TransferTest {
         aRq = new AccountRequest(EUR_ACC, "400", "EUR", user2Id, true, "130");
         target.path(ACCOUNT + "/" + CREATE).request(APPLICATION_JSON_TYPE).post(entity(aRq, APPLICATION_JSON_TYPE), CommonResponse.class);
 
-        CurRateRequest crRq = new CurRateRequest(1, "RUB_EUR", "65.21");
+        CurRateRequest crRq = new CurRateRequest(1, "RUB_EUR", "65.9375");
         target.path(CUR_RATE + "/" + CREATE).request(APPLICATION_JSON_TYPE).post(entity(crRq, APPLICATION_JSON_TYPE), CommonResponse.class);
-        crRq = new CurRateRequest(2, "EUR_RUB", "0.11");
+        crRq = new CurRateRequest(2, "EUR_RUB", "0.0156");
         target.path(CUR_RATE + "/" + CREATE).request(APPLICATION_JSON_TYPE).post(entity(crRq, APPLICATION_JSON_TYPE), CommonResponse.class);
-        crRq = new CurRateRequest(3, "EUR_GBP", "0.84");
-        target.path(CUR_RATE + "/" + CREATE).request(APPLICATION_JSON_TYPE).post(entity(crRq, APPLICATION_JSON_TYPE), CommonResponse.class);
-        crRq = new CurRateRequest(4, "RUB_RUB", "1");
+        crRq = new CurRateRequest(3, "EUR_GBP", "0.8513");
         target.path(CUR_RATE + "/" + CREATE).request(APPLICATION_JSON_TYPE).post(entity(crRq, APPLICATION_JSON_TYPE), CommonResponse.class);
     }
 
@@ -113,7 +111,6 @@ public class TransferTest {
 
     @Test
     public void testTransfer_cur() {
-        log.debug("test started");
         TransferRequest rq = new TransferRequest(FROM_ACC, EUR_ACC, "99.606", CUR);
 
         CommonResponse response = target.path(TRANSFER + "/a2a").request(APPLICATION_JSON_TYPE).post(entity(rq, APPLICATION_JSON_TYPE),
@@ -125,7 +122,7 @@ public class TransferTest {
         assertEquals("20.64", response.getMessage());
         response = target.path(ACCOUNT + "/" + FIND).queryParam("number", EUR_ACC).request(APPLICATION_JSON_TYPE).get(CommonResponse.class);
         assertEquals(response.getMessage(), OK.toString(), response.getResultCode());
-        assertEquals("410.95", response.getMessage());
+        assertEquals("401.55", response.getMessage());
     }
 
     @Test
