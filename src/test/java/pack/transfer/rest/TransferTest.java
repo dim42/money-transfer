@@ -6,6 +6,7 @@ import org.eclipse.jetty.server.Server;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import pack.transfer.dao.DbTest;
 import pack.transfer.rest.dto.AccountRequest;
 import pack.transfer.rest.dto.CommonResponse;
 import pack.transfer.rest.dto.TransferRequest;

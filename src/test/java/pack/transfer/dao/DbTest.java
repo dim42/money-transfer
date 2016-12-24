@@ -1,4 +1,4 @@
-package pack.transfer.rest;
+package pack.transfer.dao;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
