@@ -41,8 +41,6 @@ public class JettyServer {
         ServletHolder holder = new ServletHolder(ServletContainer.class);
         // Tells the Jersey Servlet which REST service/class to load.
         holder.setInitParameter(ServerProperties.PROVIDER_PACKAGES, UserResource.class.getPackage().getName());
-//        holder.setInitParameter(ServerProperties.PROVIDER_CLASSNAMES, format("%s;%s;%s", UserResource.class.getName(), AccountResource.class.getName(),
-//                TransferResource.class.getCanonicalName()));
         context.addServlet(holder, "/*");
         return server;
     }
