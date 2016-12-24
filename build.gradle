@@ -4,6 +4,7 @@ plugins {
     id 'eclipse'
     id "org.akhikhl.gretty" version "1.4.0"
     id 'application'
+    id 'war'
 }
 
 allprojects {
