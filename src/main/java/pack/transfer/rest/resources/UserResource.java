@@ -2,11 +2,11 @@ package pack.transfer.rest.resources;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import pack.transfer.api.UserService;
 import pack.transfer.rest.AppContext;
 import pack.transfer.rest.dto.CommonResponse;
 import pack.transfer.rest.dto.ResultCode;
 import pack.transfer.rest.dto.UserRequest;
-import pack.transfer.api.UserService;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;

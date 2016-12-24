@@ -8,7 +8,6 @@ import org.junit.Before;
 import org.junit.Test;
 import pack.transfer.rest.dto.AccountRequest;
 import pack.transfer.rest.dto.CommonResponse;
-import pack.transfer.rest.dto.CurRateRequest;
 import pack.transfer.rest.dto.TransferRequest;
 import pack.transfer.rest.dto.UserRequest;
 
@@ -25,7 +24,6 @@ import static pack.transfer.rest.JettyServer.JETTY_PORT;
 import static pack.transfer.rest.dto.ResultCode.FAIL;
 import static pack.transfer.rest.dto.ResultCode.OK;
 import static pack.transfer.rest.resources.AccountResource.*;
-import static pack.transfer.rest.resources.CurRateResource.CUR_RATE;
 import static pack.transfer.rest.resources.TransferResource.TRANSFER;
 import static pack.transfer.rest.resources.UserResource.USER;
 
@@ -46,6 +44,7 @@ public class TransferTest {
     public void setUp() throws Exception {
         DbTest.cleanTestDB();
         DbTest.createTestDB();
+        DbTest.insertCurRates();
 
         InetAddress inetAddress = InetAddress.getLocalHost();
         InetSocketAddress address = new InetSocketAddress(inetAddress, JETTY_PORT);
@@ -54,10 +53,10 @@ public class TransferTest {
 
         target = getWebTarget(format("%s://%s:%s", PROTOCOL, inetAddress.getHostName(), JETTY_PORT));
 
-        insertTestData();
+        insertUsersAndAccounts();
     }
 
-    private void insertTestData() {
+    private void insertUsersAndAccounts() {
         long user1Id = 1L;
         long user2Id = 2L;
         UserRequest uRq = new UserRequest(user1Id, "user1");
@@ -73,13 +72,6 @@ public class TransferTest {
         target.path(ACCOUNT + "/" + CREATE).request(APPLICATION_JSON_TYPE).post(entity(aRq, APPLICATION_JSON_TYPE), CommonResponse.class);
         aRq = new AccountRequest(EUR_ACC, "400", "EUR", user2Id, true, "130");
         target.path(ACCOUNT + "/" + CREATE).request(APPLICATION_JSON_TYPE).post(entity(aRq, APPLICATION_JSON_TYPE), CommonResponse.class);
-
-        CurRateRequest crRq = new CurRateRequest(1, "RUB_EUR", "65.9375");
-        target.path(CUR_RATE + "/" + CREATE).request(APPLICATION_JSON_TYPE).post(entity(crRq, APPLICATION_JSON_TYPE), CommonResponse.class);
-        crRq = new CurRateRequest(2, "EUR_RUB", "0.0156");
-        target.path(CUR_RATE + "/" + CREATE).request(APPLICATION_JSON_TYPE).post(entity(crRq, APPLICATION_JSON_TYPE), CommonResponse.class);
-        crRq = new CurRateRequest(3, "EUR_GBP", "0.8513");
-        target.path(CUR_RATE + "/" + CREATE).request(APPLICATION_JSON_TYPE).post(entity(crRq, APPLICATION_JSON_TYPE), CommonResponse.class);
     }
 
     @After

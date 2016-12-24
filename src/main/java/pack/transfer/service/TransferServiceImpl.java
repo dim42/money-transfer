@@ -23,7 +23,6 @@ public class TransferServiceImpl implements TransferService {
         fromAcct.checkLimit(amount);
         Account toAcct = dao.findAccount(to);
         toAcct.checkActive();
-        curRateService.sync();
         BigDecimal fromAmount = curRateService.convert(currency, fromAcct.getCurrency(), amount);
         BigDecimal toAmount = curRateService.convert(toAcct.getCurrency(), currency, amount);
         new Transfer(dao, fromAcct, fromAmount, toAcct, toAmount).run();

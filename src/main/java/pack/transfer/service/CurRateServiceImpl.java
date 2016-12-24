@@ -25,8 +25,8 @@ public class CurRateServiceImpl implements CurRateService {
 
     @Override
     public void create(int id, String c2c, String rate) {
-        sync();
         dao.create(id, c2c, rate);
+        sync();
     }
 
     @Override

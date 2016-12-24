@@ -58,6 +58,11 @@ public class DbTest {
     }
 
     public static void insertTestData() {
+        insertUsersAndAccounts();
+        insertCurRates();
+    }
+
+    private static void insertUsersAndAccounts() {
         getConnectionAndExecute((cn, dbName) -> {
             try {
                 int ind = 0;
@@ -87,17 +92,31 @@ public class DbTest {
                 stmt.setBoolean(++ind, true);
                 stmt.setString(++ind, "80");
                 stmt.execute();
+            } catch (SQLException e) {
+                log.error(e.getMessage(), e);
+                throw new RuntimeException(e);
+            }
+        });
+    }
 
-                ind = 0;
-                stmt = cn.prepareStatement(prop.get("insertCurRate").replace(SCHEMA, dbName));
+    public static void insertCurRates() {
+        getConnectionAndExecute((cn, dbName) -> {
+            try {
+                int ind = 0;
+                PreparedStatement stmt = cn.prepareStatement(prop.get("insertCurRate").replace(SCHEMA, dbName));
                 stmt.setInt(++ind, 1);
                 stmt.setString(++ind, "RUB_EUR");
-                stmt.setString(++ind, "65.21");
+                stmt.setString(++ind, "65.9375");
                 stmt.execute();
                 ind = 0;
                 stmt.setInt(++ind, 2);
+                stmt.setString(++ind, "EUR_RUB");
+                stmt.setString(++ind, "0.0156");
+                stmt.execute();
+                ind = 0;
+                stmt.setInt(++ind, 3);
                 stmt.setString(++ind, "EUR_GBP");
-                stmt.setString(++ind, "0.84");
+                stmt.setString(++ind, "0.8513");
                 stmt.execute();
             } catch (SQLException e) {
                 log.error(e.getMessage(), e);
