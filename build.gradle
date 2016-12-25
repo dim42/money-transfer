@@ -36,6 +36,7 @@ allprojects {
         compile 'com.h2database:h2:1.4.193'
         compile 'com.j256.ormlite:ormlite-core:5.0'
         compile 'com.j256.ormlite:ormlite-jdbc:5.0'
+        compile 'org.jdbi:jdbi:2.77'
 
         testCompile 'junit:junit:4.12'
     }

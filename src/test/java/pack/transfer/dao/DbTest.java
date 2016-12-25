@@ -2,12 +2,16 @@ package pack.transfer.dao;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.h2.jdbcx.JdbcConnectionPool;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.skife.jdbi.v2.DBI;
+import org.skife.jdbi.v2.Handle;
 import pack.transfer.util.PropertiesHelper;
 
+import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -98,29 +102,17 @@ public class DbTest {
     }
 
     public static void insertCurRates() {
-        getConnectionAndExecute((cn) -> {
-            try {
-                int ind = 0;
-                PreparedStatement stmt = cn.prepareStatement(prop.getSql("insertCurRate"));
-                stmt.setInt(++ind, 1);
-                stmt.setString(++ind, "RUB_EUR");
-                stmt.setString(++ind, "65.9375");
-                stmt.execute();
-                ind = 0;
-                stmt.setInt(++ind, 2);
-                stmt.setString(++ind, "EUR_RUB");
-                stmt.setString(++ind, "0.0156");
-                stmt.execute();
-                ind = 0;
-                stmt.setInt(++ind, 3);
-                stmt.setString(++ind, "EUR_GBP");
-                stmt.setString(++ind, "0.8513");
-                stmt.execute();
-            } catch (SQLException e) {
-                log.error(e.getMessage(), e);
-                throw new RuntimeException(e);
-            }
-        });
+        String dbUrl = prop.get("dbUrl") + prop.get(DB_NAME);
+        String user = prop.get("user");
+        String password = prop.get("password");
+        DataSource ds = JdbcConnectionPool.create(dbUrl, user, password);
+        DBI dbi = new DBI(ds);
+        try (Handle h = dbi.open()) {
+            String insertCurRate = prop.getSql("insertCurRate");
+            h.execute(insertCurRate, 1, "RUB_EUR", "65.9375");
+            h.execute(insertCurRate, 2, "EUR_RUB", "0.0156");
+            h.execute(insertCurRate, 3, "EUR_GBP", "0.8513");
+        }
     }
 
     private static void getConnectionAndExecute(Consumer<Connection> consumer) {
