@@ -12,9 +12,7 @@ import java.sql.SQLException;
 public class DBManagerImpl implements DBManager {
 
     private static final Logger log = LogManager.getLogger();
-    private static final String DB_DRIVER_CLASS_NAME = "dbClass";
     private final PropertiesHelper prop;
-    private final String dbName;
     private final String dbUrl;
     private final String user;
     private final String password;
@@ -27,7 +25,7 @@ public class DBManagerImpl implements DBManager {
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-        dbName = prop.get("dbName");
+        String dbName = prop.get(DB_NAME);
         dbUrl = prop.get("dbUrl") + dbName;
         user = prop.get("user");
         password = prop.get("password");
@@ -45,6 +43,6 @@ public class DBManagerImpl implements DBManager {
 
     @Override
     public String getSql(String sqlName) {
-        return prop.get(sqlName).replace(SCHEMA, dbName);
+        return prop.getSql(sqlName);
     }
 }

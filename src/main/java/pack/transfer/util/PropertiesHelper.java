@@ -7,13 +7,22 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import static pack.transfer.api.DBManager.DB_NAME;
+import static pack.transfer.api.DBManager.SCHEMA;
+
 public class PropertiesHelper {
     private static final Logger log = LogManager.getLogger();
 
     private final Properties properties;
+    private final String schemaName;
 
     public PropertiesHelper(Class<?> clazz, String fileName) {
         properties = getProperties(clazz, fileName);
+        schemaName = get(DB_NAME);
+    }
+
+    public String getSql(String sqlName) {
+        return get(sqlName).replace(SCHEMA, schemaName);
     }
 
     public String get(String key) {

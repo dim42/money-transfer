@@ -34,6 +34,8 @@ allprojects {
         compile 'org.glassfish.jersey.core:jersey-server:2.25'
         compile 'org.glassfish.jersey.containers:jersey-container-servlet:2.25'
         compile 'com.h2database:h2:1.4.193'
+        compile 'com.j256.ormlite:ormlite-core:5.0'
+        compile 'com.j256.ormlite:ormlite-jdbc:5.0'
 
         testCompile 'junit:junit:4.12'
     }

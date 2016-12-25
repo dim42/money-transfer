@@ -12,18 +12,17 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.function.BiConsumer;
+import java.util.function.Consumer;
 
 import static java.lang.String.format;
+import static pack.transfer.api.DBManager.DB_DRIVER_CLASS_NAME;
+import static pack.transfer.api.DBManager.DB_NAME;
 
 public class DbTest {
 
     private static final Logger log = LogManager.getLogger();
 
     private static final String PROP_FILE_NAME = "test_sql.xml";
-    private static final String DB_NAME = "dbName";
-    private static final String SCHEMA = "%SCHEMA%";
-    private static final String DB_DRIVER_CLASS_NAME = "dbClass";
     private static final PropertiesHelper prop = new PropertiesHelper(DbTest.class, PROP_FILE_NAME);
 
     @Before
@@ -44,12 +43,12 @@ public class DbTest {
     }
 
     public static void createTestDB() {
-        getConnectionAndExecute((cn, dbName) -> {
+        getConnectionAndExecute((cn) -> {
             try {
-                cn.prepareStatement(format("%s %s", prop.get("createSchema"), dbName)).execute();
-                cn.prepareStatement(prop.get("createUsers").replace(SCHEMA, dbName)).execute();
-                cn.prepareStatement(prop.get("createAccounts").replace(SCHEMA, dbName)).execute();
-                cn.prepareStatement(prop.get("createCurRates").replace(SCHEMA, dbName)).execute();
+                cn.prepareStatement(format("%s %s", prop.get("createSchema"), prop.get(DB_NAME))).execute();
+                cn.prepareStatement(prop.getSql("createUsers")).execute();
+                cn.prepareStatement(prop.getSql("createAccounts")).execute();
+                cn.prepareStatement(prop.getSql("createCurRates")).execute();
             } catch (SQLException e) {
                 log.error(e.getMessage(), e);
                 throw new RuntimeException(e);
@@ -63,10 +62,10 @@ public class DbTest {
     }
 
     private static void insertUsersAndAccounts() {
-        getConnectionAndExecute((cn, dbName) -> {
+        getConnectionAndExecute((cn) -> {
             try {
                 int ind = 0;
-                PreparedStatement stmt = cn.prepareStatement(prop.get("insertUser").replace(SCHEMA, dbName));
+                PreparedStatement stmt = cn.prepareStatement(prop.getSql("insertUser"));
                 stmt.setInt(++ind, 1);
                 stmt.setString(++ind, "user1");
                 stmt.execute();
@@ -76,7 +75,7 @@ public class DbTest {
                 stmt.execute();
 
                 ind = 0;
-                stmt = cn.prepareStatement(prop.get("insertAccount").replace(SCHEMA, dbName));
+                stmt = cn.prepareStatement(prop.getSql("insertAccount"));
                 stmt.setString(++ind, "1234");
                 stmt.setString(++ind, "20");
                 stmt.setString(++ind, "RUB");
@@ -100,10 +99,10 @@ public class DbTest {
     }
 
     public static void insertCurRates() {
-        getConnectionAndExecute((cn, dbName) -> {
+        getConnectionAndExecute((cn) -> {
             try {
                 int ind = 0;
-                PreparedStatement stmt = cn.prepareStatement(prop.get("insertCurRate").replace(SCHEMA, dbName));
+                PreparedStatement stmt = cn.prepareStatement(prop.getSql("insertCurRate"));
                 stmt.setInt(++ind, 1);
                 stmt.setString(++ind, "RUB_EUR");
                 stmt.setString(++ind, "65.9375");
@@ -125,15 +124,14 @@ public class DbTest {
         });
     }
 
-    private static void getConnectionAndExecute(BiConsumer<Connection, String> consumer) {
+    private static void getConnectionAndExecute(Consumer<Connection> consumer) {
         String dbClass = prop.get(DB_DRIVER_CLASS_NAME);
         classForName(dbClass);
-        String dbName = prop.get(DB_NAME);
-        String dbUrl = prop.get("dbUrl") + dbName;
+        String dbUrl = prop.get("dbUrl") + prop.get(DB_NAME);
         String user = prop.get("user");
         String password = prop.get("password");
         try (Connection cn = DriverManager.getConnection(dbUrl, user, password)) {
-            consumer.accept(cn, dbName);
+            consumer.accept(cn);
         } catch (SQLException e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e);
@@ -150,7 +148,7 @@ public class DbTest {
     }
 
     public static void cleanTestDB() {
-        getConnectionAndExecute((cn, dbName) -> {
+        getConnectionAndExecute((cn) -> {
             try {
                 cn.prepareStatement(prop.get("dropAll")).execute();
             } catch (SQLException e) {
