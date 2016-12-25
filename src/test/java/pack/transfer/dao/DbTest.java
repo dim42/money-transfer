@@ -2,7 +2,6 @@ package pack.transfer.dao;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.h2.jdbcx.JdbcConnectionPool;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -11,7 +10,6 @@ import org.skife.jdbi.v2.DBI;
 import org.skife.jdbi.v2.Handle;
 import pack.transfer.util.PropertiesHelper;
 
-import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
@@ -105,13 +103,14 @@ public class DbTest {
         String dbUrl = prop.get("dbUrl") + prop.get(DB_NAME);
         String user = prop.get("user");
         String password = prop.get("password");
-        DataSource ds = JdbcConnectionPool.create(dbUrl, user, password);
-        DBI dbi = new DBI(ds);
+        DBI dbi = new DBI(dbUrl, user, password);
         try (Handle h = dbi.open()) {
             String insertCurRate = prop.getSql("insertCurRate");
             h.execute(insertCurRate, 1, "RUB_EUR", "65.9375");
             h.execute(insertCurRate, 2, "EUR_RUB", "0.0156");
             h.execute(insertCurRate, 3, "EUR_GBP", "0.8513");
+            h.execute(insertCurRate, 4, "USD_RUB", "61.1696");
+            h.execute(insertCurRate, 5, "EUR_USD", "1.0453");
         }
     }
 

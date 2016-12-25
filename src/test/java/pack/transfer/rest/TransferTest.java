@@ -104,7 +104,7 @@ public class TransferTest {
 
     @Test
     public void testTransfer_cur() {
-        TransferRequest rq = new TransferRequest(FROM_ACC, EUR_ACC, "99.606", CUR);
+        TransferRequest rq = new TransferRequest(FROM_ACC, EUR_ACC, "1.2", "USD");
 
         CommonResponse response = target.path(TRANSFER + "/a2a").request(APPLICATION_JSON_TYPE).post(entity(rq, APPLICATION_JSON_TYPE),
                 CommonResponse.class);
@@ -112,10 +112,10 @@ public class TransferTest {
         assertEquals(response.getMessage(), OK.toString(), response.getResultCode());
         response = target.path(ACCOUNT + "/" + FIND).queryParam("number", FROM_ACC).request(APPLICATION_JSON_TYPE).get(CommonResponse.class);
         assertEquals(response.getMessage(), OK.toString(), response.getResultCode());
-        assertEquals("20.64", response.getMessage());
+        assertEquals("46.84", response.getMessage());
         response = target.path(ACCOUNT + "/" + FIND).queryParam("number", EUR_ACC).request(APPLICATION_JSON_TYPE).get(CommonResponse.class);
         assertEquals(response.getMessage(), OK.toString(), response.getResultCode());
-        assertEquals("401.55", response.getMessage());
+        assertEquals("401.25", response.getMessage());
     }
 
     @Test
