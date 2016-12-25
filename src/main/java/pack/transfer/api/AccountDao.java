@@ -7,5 +7,5 @@ public interface AccountDao {
 
     Account findAccount(String number);
 
-    void updateAccountsBalance(String accNum1, String balance1, String accNum2, String balance2);
+    void updateAccountsBalance(Account acc1, Account acc2);
 }

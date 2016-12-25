@@ -19,6 +19,13 @@ public class PropertiesHelper {
 
     public PropertiesHelper(Class<?> clazz, String fileName) {
         properties = getProperties(clazz, fileName);
+        String dbClass = get(DB_DRIVER_CLASS_NAME);
+        try {
+            Class.forName(dbClass);
+        } catch (ClassNotFoundException e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
         schemaName = get(DB_NAME);
     }
 

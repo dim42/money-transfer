@@ -9,7 +9,6 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
-import static pack.transfer.util.PropertiesHelper.DB_DRIVER_CLASS_NAME;
 import static pack.transfer.util.PropertiesHelper.DB_NAME;
 
 public class DBManagerImpl implements DBManager {
@@ -18,12 +17,6 @@ public class DBManagerImpl implements DBManager {
     private final PropertiesHelper prop;
 
     public DBManagerImpl(PropertiesHelper prop) {
-        String dbClass = prop.get(DB_DRIVER_CLASS_NAME);
-        try {
-            Class.forName(dbClass);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
         this.prop = prop;
     }
 

@@ -15,7 +15,6 @@ import java.io.IOException;
 import java.sql.SQLException;
 
 import static pack.transfer.model.User.USERS_TABLE;
-import static pack.transfer.util.PropertiesHelper.DB_DRIVER_CLASS_NAME;
 import static pack.transfer.util.PropertiesHelper.DB_NAME;
 
 public class UserDaoOrmLite implements UserDao {
@@ -24,12 +23,6 @@ public class UserDaoOrmLite implements UserDao {
     private final PropertiesHelper prop;
 
     public UserDaoOrmLite(PropertiesHelper prop) {
-        String dbClass = prop.get(DB_DRIVER_CLASS_NAME);
-        try {
-            Class.forName(dbClass);
-        } catch (ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
         this.prop = prop;
     }
 
@@ -39,6 +32,17 @@ public class UserDaoOrmLite implements UserDao {
             Dao<User, Long> dao = DaoManager.createDao(connectionSource, getTableConfig());
             int rowsUp = dao.create(new User(id, name));
             log.debug(rowsUp);
+        } catch (SQLException | IOException e) {
+            log.error(e.getMessage(), e);
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public User findUser(Long userId) {
+        try (ConnectionSource connectionSource = getJdbcConnectionSource()) {
+            Dao<User, Long> dao = DaoManager.createDao(connectionSource, getTableConfig());
+            return dao.queryForId(userId);
         } catch (SQLException | IOException e) {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e);

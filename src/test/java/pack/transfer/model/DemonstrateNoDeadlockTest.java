@@ -25,18 +25,18 @@ public class DemonstrateNoDeadlockTest {
 
         @Override
         public Account findAccount(String number) {
-            return new Account(number, String.valueOf(rnd.nextInt(1000) + 200_000_000), null, null, true, String.valueOf(rnd.nextInt(1000) + 300));
+            return new Account(number, String.valueOf(rnd.nextInt(1000) + 200_000_000), null, 42L, true, String.valueOf(rnd.nextInt(1000) + 300));
         }
 
         @Override
-        public void updateAccountsBalance(String accNum1, String balance1, String accNum2, String balance2) {
+        public void updateAccountsBalance(Account acc1, Account acc2) {
         }
     };
 
     public static void main(String[] args) {
         final Account[] accounts = new Account[NUM_ACCOUNTS];
         for (int i = 0; i < accounts.length; i++) {
-            accounts[i] = new Account("num" + i, String.valueOf(rnd.nextInt(1000) + 200_000_000), null, null, true, String.valueOf(rnd.nextInt
+            accounts[i] = new Account("num" + i, String.valueOf(rnd.nextInt(1000) + 200_000_000), null, 42L, true, String.valueOf(rnd.nextInt
                     (1000) + 300));
         }
         final CountDownLatch latch = new CountDownLatch(NUM_THREADS * NUM_ITERATIONS);

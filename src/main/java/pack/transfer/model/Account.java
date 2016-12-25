@@ -1,19 +1,36 @@
 package pack.transfer.model;
 
+import com.j256.ormlite.field.DatabaseField;
+import com.j256.ormlite.table.DatabaseTable;
+
 import java.math.BigDecimal;
 
 import static java.lang.String.format;
 import static java.math.BigDecimal.ZERO;
 import static java.math.RoundingMode.DOWN;
+import static pack.transfer.model.Account.ACCOUNTS_TABLE;
 
+@DatabaseTable(tableName = ACCOUNTS_TABLE)
 public class Account {
+    public static final String ACCOUNTS_TABLE = "accounts";
 
-    private final String number;
+    @DatabaseField(id = true, columnName = "num")
+    private String number;
+    @DatabaseField
     private BigDecimal balance;
-    private final String currency;
-    private final Long userId;
+    @DatabaseField
+    private String currency;
+    @DatabaseField(foreign = true, canBeNull = false)
+    private User user;
+    private Long userId;
+    @DatabaseField(columnName = "active")
     private boolean isActive;
+    @DatabaseField(columnName = "lim")
     private BigDecimal limit;
+
+    // for ORMLite
+    public Account() {
+    }
 
     public Account(String number, String balance, String currency, Long userId, boolean isActive, String limit) {
         this.number = number;
@@ -22,6 +39,10 @@ public class Account {
         this.userId = userId;
         this.isActive = isActive;
         this.limit = new BigDecimal(limit).setScale(2, DOWN);
+    }
+
+    public Account(String number, String balance, String currency, User user, boolean active, String limit) {
+        this(number, balance, currency, user.getId(), active, limit);
     }
 
     public BigDecimal getBalance() {

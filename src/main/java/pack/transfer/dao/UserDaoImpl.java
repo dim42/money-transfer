@@ -4,6 +4,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import pack.transfer.api.DBManager;
 import pack.transfer.api.UserDao;
+import pack.transfer.model.User;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -28,5 +29,10 @@ public class UserDaoImpl implements UserDao {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public User findUser(Long userId) {
+        throw new UnsupportedOperationException("not implemented yet");
     }
 }

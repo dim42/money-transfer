@@ -59,15 +59,15 @@ public class AccountDaoImpl implements AccountDao {
     }
 
     @Override
-    public void updateAccountsBalance(String accNum1, String balance1, String accNum2, String balance2) {
+    public void updateAccountsBalance(Account acc1, Account acc2) {
         try (Connection cn = db.getConnection()) {
             cn.setAutoCommit(false);
             PreparedStatement stmt = cn.prepareStatement(db.getSql("updateAccountBalance"));
-            stmt.setString(1, balance1);
-            stmt.setString(2, accNum1);
+            stmt.setString(1, acc1.getBalance().toString());
+            stmt.setString(2, acc1.getNumber());
             stmt.execute();
-            stmt.setString(1, balance2);
-            stmt.setString(2, accNum2);
+            stmt.setString(1, acc2.getBalance().toString());
+            stmt.setString(2, acc2.getNumber());
             stmt.execute();
             cn.commit();
         } catch (SQLException e) {

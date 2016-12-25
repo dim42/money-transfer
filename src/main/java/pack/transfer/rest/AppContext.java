@@ -6,7 +6,7 @@ import pack.transfer.api.CurRateService;
 import pack.transfer.api.TransferService;
 import pack.transfer.api.UserDao;
 import pack.transfer.api.UserService;
-import pack.transfer.dao.AccountDaoImpl;
+import pack.transfer.dao.AccountDaoOrmLite;
 import pack.transfer.dao.CurRateDaoImpl;
 import pack.transfer.dao.DBManagerImpl;
 import pack.transfer.dao.UserDaoImpl;
@@ -28,13 +28,14 @@ public class AppContext {
     static {
         PropertiesHelper prop = new PropertiesHelper(AppContext.class, PROP_FILE_NAME);
         DBManagerImpl dbManager = new DBManagerImpl(prop);
-        AccountDao accountDao = new AccountDaoImpl(dbManager);
+        UserDao daoImpl = new UserDaoImpl(dbManager);
+        UserDao userDaoOrm = new UserDaoOrmLite(prop);
+        userService = new UserServiceImpl(userDaoOrm);
+//        AccountDao accountDao = new AccountDaoImpl(dbManager);
+        AccountDao accountDao = new AccountDaoOrmLite(prop, userDaoOrm);
+        accountService = new AccountServiceImpl(accountDao);
         curRateService = new CurRateServiceImpl(new CurRateDaoImpl(dbManager));
         transferService = new TransferServiceImpl(accountDao, curRateService);
-        UserDao daoImpl = new UserDaoImpl(dbManager);
-        UserDao daoOrm = new UserDaoOrmLite(prop);
-        userService = new UserServiceImpl(daoOrm);
-        accountService = new AccountServiceImpl(accountDao);
     }
 
     public static CurRateService getCurRateService() {

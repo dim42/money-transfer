@@ -41,6 +41,6 @@ public class Transfer {
         fromAcct.checkInsufficientBalance(fromAmount);
         fromAcct.debit(fromAmount);
         toAcct.credit(toAmount);
-        accountDao.updateAccountsBalance(fromAcct.getNumber(), fromAcct.getBalance().toString(), toAcct.getNumber(), toAcct.getBalance().toString());
+        accountDao.updateAccountsBalance(fromAcct, toAcct);
     }
 }
