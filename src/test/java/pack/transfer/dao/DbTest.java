@@ -15,8 +15,8 @@ import java.sql.SQLException;
 import java.util.function.Consumer;
 
 import static java.lang.String.format;
-import static pack.transfer.api.DBManager.DB_DRIVER_CLASS_NAME;
-import static pack.transfer.api.DBManager.DB_NAME;
+import static pack.transfer.util.PropertiesHelper.DB_DRIVER_CLASS_NAME;
+import static pack.transfer.util.PropertiesHelper.DB_NAME;
 
 public class DbTest {
 

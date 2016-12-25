@@ -9,31 +9,30 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
+import static pack.transfer.util.PropertiesHelper.DB_DRIVER_CLASS_NAME;
+import static pack.transfer.util.PropertiesHelper.DB_NAME;
+
 public class DBManagerImpl implements DBManager {
-
     private static final Logger log = LogManager.getLogger();
-    private final PropertiesHelper prop;
-    private final String dbUrl;
-    private final String user;
-    private final String password;
 
-    public DBManagerImpl(String propFileName) {
-        prop = new PropertiesHelper(getClass(), propFileName);
+    private final PropertiesHelper prop;
+
+    public DBManagerImpl(PropertiesHelper prop) {
         String dbClass = prop.get(DB_DRIVER_CLASS_NAME);
         try {
             Class.forName(dbClass);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-        String dbName = prop.get(DB_NAME);
-        dbUrl = prop.get("dbUrl") + dbName;
-        user = prop.get("user");
-        password = prop.get("password");
+        this.prop = prop;
     }
 
     @Override
     public Connection getConnection() {
         try {
+            String dbUrl = prop.get("dbUrl") + prop.get(DB_NAME);
+            String user = prop.get("user");
+            String password = prop.get("password");
             return DriverManager.getConnection(dbUrl, user, password);
         } catch (SQLException e) {
             log.error(e.getMessage(), e);

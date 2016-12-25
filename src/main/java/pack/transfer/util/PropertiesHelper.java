@@ -7,11 +7,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
-import static pack.transfer.api.DBManager.DB_NAME;
-import static pack.transfer.api.DBManager.SCHEMA;
-
 public class PropertiesHelper {
     private static final Logger log = LogManager.getLogger();
+
+    private static final String SCHEMA = "%SCHEMA%";
+    public static final String DB_DRIVER_CLASS_NAME = "dbClass";
+    public static final String DB_NAME = "dbName";
 
     private final Properties properties;
     private final String schemaName;
@@ -27,6 +28,10 @@ public class PropertiesHelper {
 
     public String get(String key) {
         return properties.getProperty(key);
+    }
+
+    public String getSchemaName() {
+        return schemaName;
     }
 
     private Properties getProperties(Class<?> clazz, String fileName) {

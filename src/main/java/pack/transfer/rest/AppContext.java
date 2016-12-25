@@ -15,22 +15,24 @@ import pack.transfer.service.AccountServiceImpl;
 import pack.transfer.service.CurRateServiceImpl;
 import pack.transfer.service.TransferServiceImpl;
 import pack.transfer.service.UserServiceImpl;
-
-import static pack.transfer.api.DBManager.PROP_FILE_NAME;
+import pack.transfer.util.PropertiesHelper;
 
 public class AppContext {
+    private static String PROP_FILE_NAME = "sql.xml";
+
     private static final UserService userService;
     private static final AccountService accountService;
     private static final CurRateService curRateService;
     private static final TransferServiceImpl transferService;
 
     static {
-        DBManagerImpl dbManager = new DBManagerImpl(PROP_FILE_NAME);
+        PropertiesHelper prop = new PropertiesHelper(AppContext.class, PROP_FILE_NAME);
+        DBManagerImpl dbManager = new DBManagerImpl(prop);
         AccountDao accountDao = new AccountDaoImpl(dbManager);
         curRateService = new CurRateServiceImpl(new CurRateDaoImpl(dbManager));
         transferService = new TransferServiceImpl(accountDao, curRateService);
         UserDao daoImpl = new UserDaoImpl(dbManager);
-        UserDao daoOrm = new UserDaoOrmLite(PROP_FILE_NAME);
+        UserDao daoOrm = new UserDaoOrmLite(prop);
         userService = new UserServiceImpl(daoOrm);
         accountService = new AccountServiceImpl(accountDao);
     }

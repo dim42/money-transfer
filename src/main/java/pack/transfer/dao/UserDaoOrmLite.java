@@ -14,35 +14,28 @@ import pack.transfer.util.PropertiesHelper;
 import java.io.IOException;
 import java.sql.SQLException;
 
-import static pack.transfer.api.DBManager.DB_DRIVER_CLASS_NAME;
-import static pack.transfer.api.DBManager.DB_NAME;
 import static pack.transfer.model.User.USERS_TABLE;
+import static pack.transfer.util.PropertiesHelper.DB_DRIVER_CLASS_NAME;
+import static pack.transfer.util.PropertiesHelper.DB_NAME;
 
 public class UserDaoOrmLite implements UserDao {
     private static final Logger log = LogManager.getLogger();
 
-    private final String schemaName;
-    private final String dbUrl;
-    private final String user;
-    private final String password;
+    private final PropertiesHelper prop;
 
-    public UserDaoOrmLite(String propFileName) {
-        PropertiesHelper prop = new PropertiesHelper(getClass(), propFileName);
+    public UserDaoOrmLite(PropertiesHelper prop) {
         String dbClass = prop.get(DB_DRIVER_CLASS_NAME);
         try {
             Class.forName(dbClass);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException(e);
         }
-        schemaName = prop.get(DB_NAME);
-        dbUrl = prop.get("dbUrl") + schemaName;
-        user = prop.get("user");
-        password = prop.get("password");
+        this.prop = prop;
     }
 
     @Override
     public void createUser(Long id, String name) {
-        try (ConnectionSource connectionSource = new JdbcConnectionSource(dbUrl, user, password)) {
+        try (ConnectionSource connectionSource = getJdbcConnectionSource()) {
             Dao<User, Long> dao = DaoManager.createDao(connectionSource, getTableConfig());
             int rowsUp = dao.create(new User(id, name));
             log.debug(rowsUp);
@@ -52,10 +45,17 @@ public class UserDaoOrmLite implements UserDao {
         }
     }
 
+    private JdbcConnectionSource getJdbcConnectionSource() throws SQLException {
+        String dbUrl = prop.get("dbUrl") + prop.get(DB_NAME);
+        String user = prop.get("user");
+        String password = prop.get("password");
+        return new JdbcConnectionSource(dbUrl, user, password);
+    }
+
     private DatabaseTableConfig<User> getTableConfig() {
         DatabaseTableConfig<User> tableConfig = new DatabaseTableConfig<>();
         tableConfig.setDataClass(User.class);
-        tableConfig.setTableName(schemaName + "." + USERS_TABLE);
+        tableConfig.setTableName(prop.getSchemaName() + "." + USERS_TABLE);
         return tableConfig;
     }
 }
