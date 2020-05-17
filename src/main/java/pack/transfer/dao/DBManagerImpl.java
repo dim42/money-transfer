@@ -23,7 +23,7 @@ public class DBManagerImpl implements DBManager {
     @Override
     public Connection getConnection() {
         try {
-            String dbUrl = prop.get("dbUrl") + prop.get(DB_NAME);
+            String dbUrl = prop.get("jdbcUrl");
             String user = prop.get("user");
             String password = prop.get("password");
             return DriverManager.getConnection(dbUrl, user, password);

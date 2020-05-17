@@ -21,6 +21,7 @@ public class JettyServer {
 
     public static void main(String[] args) throws Exception {
         log.info("JettyServer main args:" + Arrays.toString(args));
+        AppContext.init();
         Server server = null;
         try {
             InetAddress inetAddress = InetAddress.getByName(LOCALHOST);

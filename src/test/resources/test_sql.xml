@@ -7,10 +7,10 @@
     <entry key="user">sa</entry>
     <entry key="password"/>
     <entry key="createSchema">
-CREATE SCHEMA
+CREATE SCHEMA IF NOT EXISTS
     </entry>
     <entry key="createUsers">
-CREATE TABLE %SCHEMA%.users (
+CREATE TABLE IF NOT EXISTS %SCHEMA%.users (
   id   INT PRIMARY KEY,
   name VARCHAR(255) UNIQUE
 )
@@ -19,7 +19,7 @@ CREATE TABLE %SCHEMA%.users (
 INSERT INTO %SCHEMA%.users VALUES (?, ?)
     </entry>
     <entry key="createAccounts">
-CREATE TABLE %SCHEMA%.accounts (
+CREATE TABLE IF NOT EXISTS %SCHEMA%.accounts (
   num      VARCHAR(255) PRIMARY KEY,
   balance  VARCHAR(255),
   currency VARCHAR(255),
@@ -33,7 +33,7 @@ CREATE TABLE %SCHEMA%.accounts (
 INSERT INTO %SCHEMA%.accounts VALUES (?, ?, ?, ?, ?, ?)
     </entry>
     <entry key="createCurRates">
-CREATE TABLE %SCHEMA%.cur_rates (
+CREATE TABLE IF NOT EXISTS %SCHEMA%.cur_rates (
   id   INT PRIMARY KEY,
   c2c  VARCHAR(255) UNIQUE,
   rate VARCHAR(255)

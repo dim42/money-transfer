@@ -17,16 +17,22 @@ import pack.transfer.service.TransferServiceImpl;
 import pack.transfer.service.UserServiceImpl;
 import pack.transfer.util.PropertiesHelper;
 
+import java.util.Properties;
+
 public class AppContext {
-    private static String PROP_FILE_NAME = "sql.xml";
+    private static final String PROP_FILE_NAME = "sql.xml";
 
-    private static final UserService userService;
-    private static final AccountService accountService;
-    private static final CurRateService curRateService;
-    private static final TransferServiceImpl transferService;
+    private static UserService userService;
+    private static AccountService accountService;
+    private static CurRateService curRateService;
+    private static TransferServiceImpl transferService;
 
-    static {
-        PropertiesHelper prop = new PropertiesHelper(AppContext.class, PROP_FILE_NAME);
+    static void init() {
+        init(new Properties());
+    }
+
+    static void init(Properties properties) {
+        PropertiesHelper prop = new PropertiesHelper(AppContext.class, PROP_FILE_NAME, properties);
         DBManagerImpl dbManager = new DBManagerImpl(prop);
         UserDao daoImpl = new UserDaoImpl(dbManager);
         UserDao userDaoOrm = new UserDaoOrmLite(prop);

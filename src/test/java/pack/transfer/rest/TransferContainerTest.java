@@ -5,7 +5,10 @@ import org.apache.logging.log4j.Logger;
 import org.eclipse.jetty.server.Server;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.ClassRule;
 import org.junit.Test;
+import org.testcontainers.containers.MySQLContainer;
+import pack.transfer.dao.DbTest;
 import pack.transfer.rest.dto.AccountRequest;
 import pack.transfer.rest.dto.CommonResponse;
 import pack.transfer.rest.dto.TransferRequest;
@@ -15,15 +18,13 @@ import pack.transfer.util.PropertiesHelper;
 import javax.ws.rs.client.WebTarget;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
+import java.time.Duration;
 import java.util.Properties;
 
 import static java.lang.String.format;
 import static javax.ws.rs.client.Entity.entity;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON_TYPE;
 import static org.junit.Assert.assertEquals;
-import static pack.transfer.dao.DbTest.cleanTestDB;
-import static pack.transfer.dao.DbTest.createTestDB;
-import static pack.transfer.dao.DbTest.insertCurRates;
 import static pack.transfer.rest.AppContext.init;
 import static pack.transfer.rest.JerseyClient.getWebTarget;
 import static pack.transfer.rest.JettyServer.JETTY_PORT;
@@ -35,7 +36,7 @@ import static pack.transfer.rest.resources.AccountResource.FIND;
 import static pack.transfer.rest.resources.TransferResource.TRANSFER;
 import static pack.transfer.rest.resources.UserResource.USER;
 
-public class TransferTest {
+public class TransferContainerTest {
 
     private static final Logger log = LogManager.getLogger();
     private static final String PROTOCOL = "http";
@@ -47,18 +48,38 @@ public class TransferTest {
 
     private Server server;
     private WebTarget target;
+    private String dbUrl;
+    private String user;
+    private String password;
+
+    //    @Rule
+    //    public MySQLContainer container = (MySQLContainer) new MySQLContainer("mysql:5.6.47")
+    @ClassRule
+    public static MySQLContainer container = (MySQLContainer) new MySQLContainer()
+            .withDatabaseName("mt_test")
+            .withStartupTimeout(Duration.ofSeconds(5));
 
     @Before
     public void setUp() throws Exception {
-        PropertiesHelper prop = new PropertiesHelper(TransferContainerTest.class, "test_sql.xml", new Properties());
-        String dbUrl = prop.get("jdbcUrl");
-        String user = prop.get("user");
-        String password = prop.get("password");
-        cleanTestDB(dbUrl, user, password);
-        createTestDB(dbUrl, user, password);
-        insertCurRates(dbUrl, user, password);
+        String host = container.getContainerIpAddress();
+        Integer port = container.getFirstMappedPort();
+        dbUrl = container.getJdbcUrl();
+        user = container.getUsername();
+        password = container.getPassword();
+        Properties prop = new Properties();
+//        prop.setProperty("dbUrl", dbUrl);
+//        prop.setProperty("dbName", "");
+        prop.setProperty("jdbcUrl", dbUrl);
+        prop.setProperty("user", user);
+        prop.setProperty("password", password);
 
-        init(prop.getProperties());
+        PropertiesHelper propHelper = new PropertiesHelper(TransferContainerTest.class, "test_sql.xml", prop);
+        DbTest.createTestDB(dbUrl, user, password);
+        DbTest.cleanTestDBMysql(dbUrl, user, password);
+        DbTest.insertCurRates(dbUrl, user, password);
+
+        init(propHelper.getProperties());
+
         InetAddress inetAddress = InetAddress.getLocalHost();
         InetSocketAddress address = new InetSocketAddress(inetAddress, JETTY_PORT);
         server = JettyServer.createServer(address);

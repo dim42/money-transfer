@@ -14,6 +14,7 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Properties;
 import java.util.function.Consumer;
 
 import static java.lang.String.format;
@@ -24,27 +25,30 @@ public class DbTest {
     private static final Logger log = LogManager.getLogger();
 
     private static final String PROP_FILE_NAME = "test_sql.xml";
-    private static final PropertiesHelper prop = new PropertiesHelper(DbTest.class, PROP_FILE_NAME);
+    private static final PropertiesHelper prop = new PropertiesHelper(DbTest.class, PROP_FILE_NAME, new Properties());
+    private static final String dbUrl = prop.get("jdbcUrl");
+    private static final String user = prop.get("user");
+    private static final String password = prop.get("password");
 
     @Before
-    public void setUp() throws Exception {
-        cleanTestDB();
+    public void setUp() {
+        cleanTestDB(dbUrl, user, password);
     }
 
     @Ignore
     @Test
-    public void testCreateDBInsertData() throws Exception {
-        createTestDB();
+    public void testCreateDBInsertData() {
+        createTestDB(dbUrl, user, password);
         insertTestData();
     }
 
     @After
     public void tearDown() {
-        cleanTestDB();
+        cleanTestDB(dbUrl, user, password);
     }
 
-    public static void createTestDB() {
-        getConnectionAndExecute((cn) -> {
+    public static void createTestDB(String dbUrl, String user, String password) {
+        getConnectionAndExecute(dbUrl, user, password, (cn) -> {
             try {
                 cn.prepareStatement(format("%s %s", prop.get("createSchema"), prop.get(DB_NAME))).execute();
                 cn.prepareStatement(prop.getSql("createUsers")).execute();
@@ -57,13 +61,13 @@ public class DbTest {
         });
     }
 
-    public static void insertTestData() {
+    public void insertTestData() {
         insertUsersAndAccounts();
-        insertCurRates();
+        insertCurRates(dbUrl, user, password);
     }
 
-    private static void insertUsersAndAccounts() {
-        getConnectionAndExecute((cn) -> {
+    private void insertUsersAndAccounts() {
+        getConnectionAndExecute(dbUrl, user, password, (cn) -> {
             try {
                 int ind = 0;
                 PreparedStatement stmt = cn.prepareStatement(prop.getSql("insertUser"));
@@ -99,10 +103,7 @@ public class DbTest {
         });
     }
 
-    public static void insertCurRates() {
-        String dbUrl = prop.get("dbUrl") + prop.get(DB_NAME);
-        String user = prop.get("user");
-        String password = prop.get("password");
+    public static void insertCurRates(String dbUrl, String user, String password) {
         DBI dbi = new DBI(dbUrl, user, password);
         try (Handle h = dbi.open()) {
             String insertCurRate = prop.getSql("insertCurRate");
@@ -114,10 +115,7 @@ public class DbTest {
         }
     }
 
-    private static void getConnectionAndExecute(Consumer<Connection> consumer) {
-        String dbUrl = prop.get("dbUrl") + prop.get(DB_NAME);
-        String user = prop.get("user");
-        String password = prop.get("password");
+    private static void getConnectionAndExecute(String dbUrl, String user, String password, Consumer<Connection> consumer) {
         try (Connection cn = DriverManager.getConnection(dbUrl, user, password)) {
             consumer.accept(cn);
         } catch (SQLException e) {
@@ -126,10 +124,23 @@ public class DbTest {
         }
     }
 
-    public static void cleanTestDB() {
-        getConnectionAndExecute((cn) -> {
+    public static void cleanTestDB(String dbUrl, String user, String password) {
+        getConnectionAndExecute(dbUrl, user, password, (cn) -> {
             try {
                 cn.prepareStatement(prop.get("dropAll")).execute();
+            } catch (SQLException e) {
+                log.error(e.getMessage(), e);
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    public static void cleanTestDBMysql(String dbUrl, String user, String password) {
+        getConnectionAndExecute(dbUrl, user, password, (cn) -> {
+            try {
+                cn.prepareStatement("TRUNCATE TABLE cur_rates").execute();
+                cn.prepareStatement("TRUNCATE TABLE accounts").execute();
+                cn.prepareStatement("DELETE FROM users").execute();
             } catch (SQLException e) {
                 log.error(e.getMessage(), e);
                 throw new RuntimeException(e);

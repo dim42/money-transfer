@@ -73,7 +73,7 @@ public class AccountDaoOrmLite implements AccountDao {
     }
 
     private JdbcConnectionSource getJdbcConnectionSource() throws SQLException {
-        String dbUrl = prop.get("dbUrl") + prop.get(DB_NAME);
+        String dbUrl = prop.get("jdbcUrl");
         String user = prop.get("user");
         String password = prop.get("password");
         return new JdbcConnectionSource(dbUrl, user, password);

@@ -17,8 +17,10 @@ public class PropertiesHelper {
     private final Properties properties;
     private final String schemaName;
 
-    public PropertiesHelper(Class<?> clazz, String fileName) {
-        properties = getProperties(clazz, fileName);
+    public PropertiesHelper(Class<?> clazz, String fileName, Properties prop) {
+        properties = loadProperties(clazz, fileName);
+        properties.setProperty("jdbcUrl", get("dbUrl") + get(DB_NAME));
+        prop.forEach((k, v) -> properties.setProperty((String) k, (String) v));
         String dbClass = get(DB_DRIVER_CLASS_NAME);
         try {
             Class.forName(dbClass);
@@ -41,7 +43,7 @@ public class PropertiesHelper {
         return schemaName;
     }
 
-    private Properties getProperties(Class<?> clazz, String fileName) {
+    private Properties loadProperties(Class<?> clazz, String fileName) {
         InputStream in = clazz.getClassLoader().getResourceAsStream(fileName);
         Properties prop = new Properties();
         try {
@@ -51,5 +53,9 @@ public class PropertiesHelper {
             log.error(e.getMessage(), e);
             throw new RuntimeException(e);
         }
+    }
+
+    public Properties getProperties() {
+        return properties;
     }
 }
